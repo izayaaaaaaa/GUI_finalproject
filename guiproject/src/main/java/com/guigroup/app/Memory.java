@@ -9,6 +9,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +20,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
 import javax.swing.Timer;
@@ -27,12 +27,12 @@ import javax.swing.Timer;
 public class Memory {
     private JFrame frame;
     private JPanel panelTitle, panelGrid, panelControl;
-    private JButton buttonNew, buttonSolve, buttonAbout;
+    private JButton buttonNew, buttonSolve, buttonStart;
 
     private buttonGame buttonLastClicked;
     private final Images imagens;
     
-    private JLabel labelTitle;
+    private JLabel labelTitle, labelTimer;
     
     Integer intQtdOpened;
     Integer intCombined;
@@ -42,7 +42,8 @@ public class Memory {
     private List<buttonGame> listButtons;
 
     private Timer timer;
-    private int timeLeft = 10; // in secs
+    private int timeLeft = 11; // in secs
+    private boolean gameTimerStart = false; // Cards cannot be flipped if false.
 
     private JMenuBar menuBar;
     private JMenu levelsMenu, optionsMenu;
@@ -72,6 +73,9 @@ public class Memory {
         }
         Collections.shuffle(listShuffle);
 
+    }
+    
+    private void countdown(){ // Starts the timer
         timer = new Timer(1000, new TimerListener()); // fire every second
         timer.start();
     }
@@ -81,10 +85,10 @@ public class Memory {
         public void actionPerformed(ActionEvent e) {
           System.out.println("Time remaining: " + timeLeft + " seconds");  
           timeLeft--;
+          labelTimer.setText("Countdown: " + timeLeft);
 
           if (timeLeft == 0) {
             timer.stop();
-            NewGame();
           }
         }
     }
@@ -107,6 +111,7 @@ public class Memory {
         panelGrid.repaint();
     }
     private void NewGame(){
+        gameTimerStart = false;
         Collections.shuffle(listShuffle);
         intQtdOpened = 0;
         intCombined = 0;
@@ -122,8 +127,16 @@ public class Memory {
         panelGrid.repaint();
         
         System.out.println("New game starting...");
-        
+        if(timer.isRunning()){
+            timer.stop();
+        }
     }
+        
+    private void Start(){
+        countdown();
+        gameTimerStart = true;
+    }
+    
     public void ShowWindow(){
         frame = new JFrame("Memory");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -190,12 +203,15 @@ public class Memory {
         // Title
         labelTitle = new JLabel("Number of Clicks: 0");
         enlargeFont(labelTitle, 2);
+        labelTimer = new JLabel("Countdown:" + timeLeft);
+        enlargeFont(labelTimer, 2);
         
-        panelTitle = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        panelTitle = new JPanel(new GridLayout());
         panelTitle.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 
 
         panelTitle.add(labelTitle);
+        panelTitle.add(labelTimer);
         frame.add(panelTitle,BorderLayout.NORTH);
         
         // Controls
@@ -208,9 +224,9 @@ public class Memory {
         buttonSolve = new JButton("Solve");
         enlargeFont(buttonSolve, 2);
         panelControl.add(buttonSolve);
-        buttonAbout = new JButton("About");
-        enlargeFont(buttonAbout, 2);
-        panelControl.add(buttonAbout);
+        buttonStart = new JButton("Start");
+        enlargeFont(buttonStart, 2);
+        panelControl.add(buttonStart);
         frame.add(panelControl,BorderLayout.SOUTH);
         
 
@@ -252,10 +268,10 @@ public class Memory {
           public void mouseExited(MouseEvent e) {}
         });
 
-        buttonAbout.addMouseListener(new MouseListener() {
+        buttonStart.addMouseListener(new MouseListener() {
           @Override
           public void mouseClicked(MouseEvent e) {
-            JOptionPane.showMessageDialog(frame,"Just For Fun");
+            Start();
           }
 
           @Override
@@ -311,33 +327,33 @@ public class Memory {
 
                         labelTitle.setText("Number of Clicks: " + ++intQtdOpened);
                         
-                        buttonItem.setIcon(imagens.IconFactory(buttonItem.iCod));
+                        if(gameTimerStart == true){
+                          buttonItem.setIcon(imagens.IconFactory(buttonItem.iCod));
                         
-                        if(buttonLastClicked == null){
-                            buttonLastClicked = buttonItem;
-                            return;
-                        }
+                          if(buttonLastClicked == null){
+                              buttonLastClicked = buttonItem;
+                              return;
+                          }
 
-                        
-                        
-                        
-                        if(Objects.equals(buttonItem.iCod, buttonLastClicked.iCod)){
+                          if(Objects.equals(buttonItem.iCod, buttonLastClicked.iCod)){
 
-                            buttonItem.setIcon(imagens.IconFactory(0));
-                            buttonItem.iCod = 0;
+                              buttonItem.setIcon(imagens.IconFactory(0));
+                              buttonItem.iCod = 0;
 
-                            buttonLastClicked.setIcon(imagens.IconFactory(0));
-                            buttonLastClicked.iCod = 0;
+                              buttonLastClicked.setIcon(imagens.IconFactory(0));
+                              buttonLastClicked.iCod = 0;
 
-                            buttonLastClicked = null;
-                            intCombined++;
-                            if(intCombined >= 12){
-                                Solve(true);
-                            }
-                                
-                        }else{
+                              buttonLastClicked = null;
+                              intCombined++;
+                              if(intCombined >= 12){
+                                  Solve(true);
+                              }
+                                  
+                          }
+                          else {
                             buttonLastClicked.setIcon(imagens.IconFactory(-1));
                             buttonLastClicked = buttonItem;
+                          }
                         }
                     }
                 });
