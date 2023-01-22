@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
+import javax.swing.Timer;
 
 public class Memory {
     private JFrame frame;
@@ -36,6 +37,9 @@ public class Memory {
 
     
     private List<buttonGame> listButtons;
+
+    private Timer timer;
+    private int timeLeft = 10; // in secs
     
     private class buttonGame extends JButton{
         Integer iCod;
@@ -60,8 +64,24 @@ public class Memory {
             listShuffle.add(i);
         }
         Collections.shuffle(listShuffle);
+
+        timer = new Timer(1000, new TimerListener()); // fire every second
+        timer.start();
     }
     
+    private class TimerListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          System.out.println("Time remaining: " + timeLeft + " seconds");  
+          timeLeft--;
+
+          if (timeLeft == 0) {
+            timer.stop();
+            NewGame();
+          }
+        }
+    }
+
     private void Solve(Boolean bMostrarCliques){
         if(intQtdOpened == -1) return;
         labelTitle.setText("Number of Clicks: " + 
@@ -94,6 +114,7 @@ public class Memory {
         }
         panelGrid.repaint();
         
+        System.out.println("New game starting...");
         
     }
     public void ShowWindow(){
