@@ -1,3 +1,7 @@
+// number of clicks bug - still counts even when timer is not moving
+// counter bug; does not reset on second click
+// resume: check for other bugs
+
 package com.guigroup.app;
 
 import java.awt.event.ActionEvent;
@@ -41,8 +45,8 @@ public class Memory {
     
     private List<buttonGame> listButtons;
 
-    private Timer timer;
-    private int timeLeft = 11; // in secs
+    private Timer timer, timer2;
+    private int timeLeft; // in secs
     private boolean gameTimerStart = false; // Cards cannot be flipped if false.
 
     private JMenuBar menuBar;
@@ -76,24 +80,46 @@ public class Memory {
     }
     
     private void countdown(){ // Starts the timer
+        timeLeft= 11;
         timer = new Timer(1000, new TimerListener()); // fire every second
         timer.start();
     }
     
     private class TimerListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          System.out.println("Time remaining: " + timeLeft + " seconds");  
-          timeLeft--;
-          labelTimer.setText("Countdown: " + timeLeft);
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        System.out.println("Time remaining: " + timeLeft + " seconds");  
+        timeLeft--;
+        labelTimer.setText("Countdown: " + timeLeft);
 
-          if (timeLeft == 0) {
-            timer.stop();
+        if (timeLeft == 0 && gameTimerStart == false) {
+          timer2.stop();
+          gameTimerStart = true;
+          System.out.println("gameTimerStart = true;");
+          for(int i = 0; i < listButtons.size();i++){
+              buttonGame button = listButtons.get(i);
+              button.setIcon(imagens.IconFactory(-1));
           }
+          Start();
         }
+        else if(timeLeft == 0) {
+          timer.stop();
+        }
+      }
+    }
+
+    private void showCard(){
+      timeLeft= 5;
+      timer2 = new Timer(1000, new TimerListener()); // fire every second
+      timer2.start();
+      for(int i = 0; i < listButtons.size();i++){
+          buttonGame button = listButtons.get(i);
+          button.setIcon(imagens.IconFactory((Integer) listShuffle.get(i)));
+      }
     }
 
     private void Solve(Boolean bMostrarCliques){
+        timer.stop();
         if(intQtdOpened == -1) return;
         labelTitle.setText("Number of Clicks: " + 
                 (bMostrarCliques? intQtdOpened.toString():"Auto Resolution"));
@@ -133,9 +159,16 @@ public class Memory {
     }
         
     private void Start(){
-        countdown();
-        gameTimerStart = true;
-    }
+      if(gameTimerStart == false){
+          showCard();
+          
+      }
+      if(gameTimerStart == true){
+          System.out.println("To countdown;");
+          countdown();
+      }
+          
+  }
     
     public void ShowWindow(){
         frame = new JFrame("Memory");
@@ -312,7 +345,6 @@ public class Memory {
                 c.gridy = j;
                 panelGrid.add(buttonItem, c);
 
-                // list botoes usado no novo jogo
                 listButtons.add(buttonItem);
                 
                 buttonItem.addActionListener(new ActionListener() {
