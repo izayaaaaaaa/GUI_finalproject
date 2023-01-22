@@ -2,6 +2,8 @@ package com.guigroup.app;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -12,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import javax.swing.*;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -40,6 +43,10 @@ public class Memory {
 
     private Timer timer;
     private int timeLeft = 10; // in secs
+
+    private JMenuBar menuBar;
+    private JMenu levelsMenu, optionsMenu;
+    private JMenuItem easyItem, mediumItem, hardItem, aboutItem, exitItem;
     
     private class buttonGame extends JButton{
         Integer iCod;
@@ -122,8 +129,64 @@ public class Memory {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
         
+        // Menu
+        menuBar = new JMenuBar();
         
+        levelsMenu = new JMenu("Levels");
+        easyItem = new JMenuItem("Easy");
+        mediumItem = new JMenuItem("Medium");
+        hardItem = new JMenuItem("Hard");
+
+        optionsMenu = new JMenu("Options");
+        aboutItem = new JMenuItem("About");
+        exitItem = new JMenuItem("Exit");
+
+        levelsMenu.add(easyItem);
+        levelsMenu.add(mediumItem);
+        levelsMenu.add(hardItem);
         
+        optionsMenu.add(aboutItem);
+        optionsMenu.add(exitItem);
+        
+        menuBar.add(levelsMenu);
+        menuBar.add(optionsMenu);
+        frame.setJMenuBar(menuBar);
+
+        // action listener for each menu item
+        easyItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Easy");
+            }
+        });
+        mediumItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Medium");
+            }
+        });
+        hardItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Hard");
+            }
+        });
+        aboutItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("About");
+            }
+        });
+
+        exitItem.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+              System.out.println("Exit");
+              System.exit(0);
+          }
+        });
+        
+
         // Title
         labelTitle = new JLabel("Number of Clicks: 0");
         enlargeFont(labelTitle, 2);
@@ -151,25 +214,61 @@ public class Memory {
         frame.add(panelControl,BorderLayout.SOUTH);
         
 
-        buttonNew.addActionListener(new ActionListener() {
+        buttonNew.addMouseListener(new MouseListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void mouseClicked(MouseEvent e) {
                 NewGame();
             }
+
+            @Override
+            public void mousePressed(MouseEvent e) {}
+
+            @Override
+            public void mouseReleased(MouseEvent e) {}
+
+            @Override
+            public void mouseEntered(MouseEvent e) {}
+
+            @Override
+            public void mouseExited(MouseEvent e) {}
         });
 
-        buttonSolve.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Solve(false);
-            }
+        buttonSolve.addMouseListener(new MouseListener() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            Solve(false);
+          }
+
+          @Override
+          public void mousePressed(MouseEvent e) {}
+
+          @Override
+          public void mouseReleased(MouseEvent e) {}
+
+          @Override
+          public void mouseEntered(MouseEvent e) {}
+
+          @Override
+          public void mouseExited(MouseEvent e) {}
         });
 
-        buttonAbout.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(frame,"Just For Fun");
-            }
+        buttonAbout.addMouseListener(new MouseListener() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            JOptionPane.showMessageDialog(frame,"Just For Fun");
+          }
+
+          @Override
+          public void mousePressed(MouseEvent e) {}
+
+          @Override
+          public void mouseReleased(MouseEvent e) {}
+
+          @Override
+          public void mouseEntered(MouseEvent e) {}
+
+          @Override
+          public void mouseExited(MouseEvent e) {}
         });
 
         // grid principal
