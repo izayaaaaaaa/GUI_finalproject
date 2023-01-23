@@ -1,7 +1,5 @@
-// number of clicks bug - still counts even when timer is not moving
-// counter bug; does not reset on second click
-// resume: check for other bugs
-
+// no clicks counter!!
+// start -> new game -> solve (cheat/bug)
 package com.guigroup.app;
 
 import java.awt.event.ActionEvent;
@@ -86,43 +84,44 @@ public class Memory {
     }
     
     private class TimerListener implements ActionListener {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        System.out.println("Time remaining: " + timeLeft + " seconds");  
-        timeLeft--;
-        labelTimer.setText("Countdown: " + timeLeft);
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("Time remaining: " + timeLeft + " seconds");  
+            timeLeft--;
+            labelTimer.setText("Countdown: " + timeLeft);
 
-        if (timeLeft == 0 && gameTimerStart == false) {
-          timer2.stop();
-          gameTimerStart = true;
-          System.out.println("gameTimerStart = true;");
-          for(int i = 0; i < listButtons.size();i++){
-              buttonGame button = listButtons.get(i);
-              button.setIcon(imagens.IconFactory(-1));
-          }
-          Start();
+            if (timeLeft == 0 && gameTimerStart == false) {
+                timer2.stop();
+                gameTimerStart = true;
+                System.out.println("gameTimerStart = true;");
+                for(int i = 0; i < listButtons.size();i++){
+                    buttonGame button = listButtons.get(i);
+                    button.setIcon(imagens.IconFactory(-1));
+                }
+                Start();
+            }
+            else if(timeLeft == 0) {
+                timer.stop();
+                Solve(true);
+            }
         }
-        else if(timeLeft == 0) {
-          timer.stop();
-        }
-      }
     }
 
     private void showCard(){
-      timeLeft= 5;
-      timer2 = new Timer(1000, new TimerListener()); // fire every second
-      timer2.start();
-      for(int i = 0; i < listButtons.size();i++){
-          buttonGame button = listButtons.get(i);
-          button.setIcon(imagens.IconFactory((Integer) listShuffle.get(i)));
-      }
+        timeLeft= 5;
+        timer2 = new Timer(1000, new TimerListener()); // fire every second
+        timer2.start();
+        for(int i = 0; i < listButtons.size();i++){
+            buttonGame button = listButtons.get(i);
+            button.setIcon(imagens.IconFactory((Integer) listShuffle.get(i)));
+        }
     }
 
     private void Solve(Boolean bMostrarCliques){
         timer.stop();
         if(intQtdOpened == -1) return;
         labelTitle.setText("Number of Clicks: " + 
-                (bMostrarCliques? intQtdOpened.toString():"Auto Resolution"));
+            (bMostrarCliques? intQtdOpened.toString():"Auto Resolution"));
 
         intQtdOpened = -1;
         intCombined = 12;
@@ -136,7 +135,20 @@ public class Memory {
         }
         panelGrid.repaint();
     }
+    
     private void NewGame(){
+        try{
+            if(timer2.isRunning()){
+                timer2.stop();
+                labelTimer.setText("Countdown: 0");
+            }
+            else if(timer.isRunning()){
+                timer.stop();
+            }
+        }catch(Exception e){
+            System.out.println("Exception:"+e);
+        }
+
         gameTimerStart = false;
         Collections.shuffle(listShuffle);
         intQtdOpened = 0;
@@ -150,25 +162,22 @@ public class Memory {
             button.setIcon(imagens.IconFactory(-1));
             listButtons.set(i, button);
         }
+        
         panelGrid.repaint();
-        
         System.out.println("New game starting...");
-        if(timer.isRunning()){
-            timer.stop();
-        }
+            
     }
-        
+            
     private void Start(){
-      if(gameTimerStart == false){
-          showCard();
-          
-      }
-      if(gameTimerStart == true){
-          System.out.println("To countdown;");
-          countdown();
-      }
-          
-  }
+        if(gameTimerStart == false){
+            showCard();
+                
+        }
+        if(gameTimerStart == true){
+            countdown();
+            buttonSolve.setVisible(true);
+        } 
+    }
     
     public void ShowWindow(){
         frame = new JFrame("Memory");
@@ -225,11 +234,11 @@ public class Memory {
         });
 
         exitItem.addActionListener(new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-              System.out.println("Exit");
-              System.exit(0);
-          }
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Exit");
+                System.exit(0);
+            }
         });
         
 
@@ -249,7 +258,7 @@ public class Memory {
         
         // Controls
         panelControl = new JPanel(new FlowLayout(FlowLayout.CENTER
-                , 50, 0));
+                        , 50, 0));
         panelControl.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         buttonNew = new JButton("New Game");
         enlargeFont(buttonNew, 2);
@@ -265,12 +274,14 @@ public class Memory {
 
         buttonNew.addMouseListener(new MouseListener() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                NewGame();
-            }
+            public void mouseClicked(MouseEvent e) {}
 
             @Override
-            public void mousePressed(MouseEvent e) {}
+            public void mousePressed(MouseEvent e) {
+                NewGame();
+                buttonStart.setVisible(true);
+                buttonSolve.setVisible(false);
+            }
 
             @Override
             public void mouseReleased(MouseEvent e) {}
@@ -283,41 +294,44 @@ public class Memory {
         });
 
         buttonSolve.addMouseListener(new MouseListener() {
-          @Override
-          public void mouseClicked(MouseEvent e) {
-            Solve(false);
-          }
+            @Override
+            public void mouseClicked(MouseEvent e) {}
 
-          @Override
-          public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Solve(false);
+                buttonStart.setVisible(false);
+            }
 
-          @Override
-          public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
 
-          @Override
-          public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
 
-          @Override
-          public void mouseExited(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
         });
 
         buttonStart.addMouseListener(new MouseListener() {
-          @Override
-          public void mouseClicked(MouseEvent e) {
-            Start();
-          }
+            @Override
+            public void mouseClicked(MouseEvent e) {}
 
-          @Override
-          public void mousePressed(MouseEvent e) {}
+            @Override
+            public void mousePressed(MouseEvent e) {
+                Start();
+                buttonStart.setVisible(false);
+                buttonSolve.setVisible(false);
+            }
 
-          @Override
-          public void mouseReleased(MouseEvent e) {}
+            @Override
+            public void mouseReleased(MouseEvent e) {}
 
-          @Override
-          public void mouseEntered(MouseEvent e) {}
+            @Override
+            public void mouseEntered(MouseEvent e) {}
 
-          @Override
-          public void mouseExited(MouseEvent e) {}
+            @Override
+            public void mouseExited(MouseEvent e) {}
         });
 
         // grid principal
@@ -360,32 +374,31 @@ public class Memory {
                         labelTitle.setText("Number of Clicks: " + ++intQtdOpened);
                         
                         if(gameTimerStart == true){
-                          buttonItem.setIcon(imagens.IconFactory(buttonItem.iCod));
-                        
-                          if(buttonLastClicked == null){
-                              buttonLastClicked = buttonItem;
-                              return;
-                          }
+                            buttonItem.setIcon(imagens.IconFactory(buttonItem.iCod));
+                                        
+                            if(buttonLastClicked == null){
+                                buttonLastClicked = buttonItem;
+                                return;
+                            }
 
-                          if(Objects.equals(buttonItem.iCod, buttonLastClicked.iCod)){
+                            if(Objects.equals(buttonItem.iCod, buttonLastClicked.iCod)){
 
-                              buttonItem.setIcon(imagens.IconFactory(0));
-                              buttonItem.iCod = 0;
+                                buttonItem.setIcon(imagens.IconFactory(0));
+                                buttonItem.iCod = 0;
 
-                              buttonLastClicked.setIcon(imagens.IconFactory(0));
-                              buttonLastClicked.iCod = 0;
+                                buttonLastClicked.setIcon(imagens.IconFactory(0));
+                                buttonLastClicked.iCod = 0;
 
-                              buttonLastClicked = null;
-                              intCombined++;
-                              if(intCombined >= 12){
-                                  Solve(true);
-                              }
-                                  
-                          }
-                          else {
-                            buttonLastClicked.setIcon(imagens.IconFactory(-1));
-                            buttonLastClicked = buttonItem;
-                          }
+                                buttonLastClicked = null;
+                                intCombined++;
+                                if(intCombined >= 12){
+                                    Solve(true);
+                                }	
+                            }
+                            else {
+                                buttonLastClicked.setIcon(imagens.IconFactory(-1));
+                                buttonLastClicked = buttonItem;
+                            }
                         }
                     }
                 });
@@ -397,9 +410,6 @@ public class Memory {
         frame.pack();
         frame.setMinimumSize(frame.getPreferredSize());
         frame.setVisible(true);
-
-
-
     }
     /**
      * @param args the command line arguments
@@ -415,9 +425,5 @@ public class Memory {
                 
             }
         });
-
-        
-        
     }
-    
 }
