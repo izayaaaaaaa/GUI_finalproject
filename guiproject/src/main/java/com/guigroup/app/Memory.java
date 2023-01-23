@@ -14,7 +14,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-
 import javax.swing.*;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -37,8 +36,8 @@ public class Memory {
     Integer numCorrectPairs;
 
     private JMenuBar menuBar;
-    private JMenu levelsMenu, optionsMenu;
-    private JMenuItem easyItem, mediumItem, hardItem, aboutItem, exitItem;
+    private JMenu levelsMenu, optionsMenu, gameMenu;
+    private JMenuItem easyItem, mediumItem, hardItem, aboutItem, exitItem, newGameItem, solveGameItem, startGameItem;
     
     JPanel panelTitle, panelGrid, panelControl;
     private JButton buttonNew, buttonSolve, buttonStart;
@@ -70,16 +69,18 @@ public class Memory {
         setupLevel();
         createPanelGrid();
         
-        
         frame.pack();
-        // frame.setMinimumSize(frame.getPreferredSize());
         frame.setVisible(true);
     }
 
     private void createMenuBar(){
-        // Menu
         menuBar = new JMenuBar();
         
+        gameMenu = new JMenu("Game");
+        newGameItem = new JMenuItem("New Game");
+        solveGameItem = new JMenuItem("Solve");
+        startGameItem = new JMenuItem("Start");
+
         levelsMenu = new JMenu("Levels");
         easyItem = new JMenuItem("Easy");
         mediumItem = new JMenuItem("Medium");
@@ -89,6 +90,10 @@ public class Memory {
         aboutItem = new JMenuItem("About");
         exitItem = new JMenuItem("Exit");
 
+        gameMenu.add(newGameItem);
+        gameMenu.add(solveGameItem);
+        gameMenu.add(startGameItem);
+
         levelsMenu.add(easyItem);
         levelsMenu.add(mediumItem);
         levelsMenu.add(hardItem);
@@ -96,42 +101,50 @@ public class Memory {
         optionsMenu.add(aboutItem);
         optionsMenu.add(exitItem);
         
+        menuBar.add(gameMenu);
         menuBar.add(levelsMenu);
         menuBar.add(optionsMenu);
 
         frame.setJMenuBar(menuBar);      
 
+        //generate one actionlistener for each game menu item
+        newGameItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                newGameTest();
+                buttonStart.setVisible(true);
+                buttonSolve.setVisible(false);
+            }
+        });
+        solveGameItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                solveGameTest();
+                buttonStart.setVisible(false);
+                buttonSolve.setVisible(true);
+            }
+        });
+        startGameItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                startGameTest();
+                buttonStart.setVisible(false);
+                buttonSolve.setVisible(false);
+            }
+        });
+
         easyItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 level = 1;
-                gameDeck = new Deck(level);
-                setupLevel();
-                
-                frame.remove(panelGrid);
-                System.out.println("Just removed panelGrid. About to create new panelGrid.");
-                frame.validate();
-                createPanelGrid();
-                // frame.add(panelGrid,BorderLayout.CENTER);
-                frame.pack();
-                frame.validate();
-                frame.repaint();
+                changeGrid(level);
             }
         });
         mediumItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 level = 2;
-                gameDeck = new Deck(level);
-                setupLevel();
-                
-                frame.remove(panelGrid);
-                // System.out.println("Just removed panelGrid. About to create new panelGrid.");
-                // frame.validate();
-                createPanelGrid();
-                frame.pack();
-                frame.validate();
-                frame.repaint();
+                changeGrid(level);
             }
 
         });
@@ -139,17 +152,7 @@ public class Memory {
             @Override
             public void actionPerformed(ActionEvent e) {
                 level = 3;
-                gameDeck = new Deck(level);
-                setupLevel();
-                
-                frame.remove(panelGrid);
-                System.out.println("Just removed panelGrid. About to create new panelGrid.");
-                frame.validate();
-                createPanelGrid();
-                
-                frame.pack();
-                frame.validate();
-                frame.repaint();
+                changeGrid(level);
             }
         });
         aboutItem.addActionListener(new ActionListener() {
@@ -327,8 +330,6 @@ public class Memory {
         frame.add(panelGrid,BorderLayout.CENTER);
     }
 
-    // ================================================ TIMER FEATURE ================================================
-
     private void Start(){
         if(gameTimerStart == false){
             showCard();
@@ -465,6 +466,23 @@ public class Memory {
             this.cardNo = cardNo;
         }
     }
+
+    private void changeGrid(int level) {
+        gameDeck = new Deck(level);
+        setupLevel();
+        frame.remove(panelGrid);
+        createPanelGrid();
+        frame.pack();
+        frame.validate();
+        frame.repaint();
+    }
+
+    public void newGameTest(){}
+
+    public void solveGameTest(){}
+
+    public void startGameTest(){}
+    
     
     /**
      * @param args the command line arguments
