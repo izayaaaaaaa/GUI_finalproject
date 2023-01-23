@@ -15,8 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-// import java.util.logging.Level;
-// import java.util.logging.Logger;
+
 
 import javax.swing.*;
 import javax.swing.BorderFactory;
@@ -34,7 +33,7 @@ public class Memory {
     
     private Deck gameDeck;
 
-    ArrayList<Integer> listShuffle;
+    private ArrayList<Integer> listShuffle;
     private List<buttonCard> listCards;
 
     Integer numCorrectPairs;
@@ -54,6 +53,7 @@ public class Memory {
     private buttonCard previousCard;
 
     private int round, level, gridRow, gridCol, numCards;
+    // private Map<String, Integer> levelVarValues;;
     
     
     // ================================================ COMPILE RUN THROUGH ================================================
@@ -62,6 +62,9 @@ public class Memory {
         round = 0;
         gameDeck = new Deck(level);
         numCorrectPairs = 0;
+        
+        
+        
     }
 
     public void createGUI(){
@@ -69,14 +72,20 @@ public class Memory {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
         
-        createMenuBar(); 
+        createMenuBar();
         createPanelTitle();
         createPanelControl();
-        setupLevel(6, 4, 3, level);
+        // createShuffledNumbers();
+        setupLevel();
         createPanelGrid();
         
+        frame.setJMenuBar(menuBar); 
+        frame.add(panelTitle,BorderLayout.NORTH);
+        frame.add(panelControl,BorderLayout.SOUTH);
+        frame.add(panelGrid,BorderLayout.CENTER);
+
         frame.pack();
-        frame.setMinimumSize(frame.getPreferredSize());
+        // frame.setMinimumSize(frame.getPreferredSize());
         frame.setVisible(true);
     }
 
@@ -102,29 +111,29 @@ public class Memory {
         
         menuBar.add(levelsMenu);
         menuBar.add(optionsMenu);
-        frame.setJMenuBar(menuBar);
+        
 
         easyItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                level = 1;
                 gameDeck = new Deck(1);
-                
-
+                System.out.println("Deck Level " + level);
             }
         });
         mediumItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                gameDeck = new Deck(2);
                 level = 2;
+                gameDeck = new Deck(level);
                 System.out.println("Deck Level " + level);
             }
         });
         hardItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                gameDeck = new Deck(3);
                 level = 3;
+                gameDeck = new Deck(level);
                 System.out.println("Deck Level " + level);
             }
         });
@@ -153,7 +162,6 @@ public class Memory {
         panelTitle.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         panelTitle.add(labelTimer);
 
-        frame.add(panelTitle,BorderLayout.NORTH);
     }
 
     private void createPanelControl(){
@@ -173,7 +181,7 @@ public class Memory {
         enlargeFont(buttonStart, 2);
         panelControl.add(buttonStart);
 
-        frame.add(panelControl,BorderLayout.SOUTH);
+        
 
         buttonNew.addMouseListener(new MouseListener() {
             @Override
@@ -242,18 +250,26 @@ public class Memory {
         panelGrid = new JPanel(new GridBagLayout());
         panelGrid.setBorder(new BevelBorder(BevelBorder.RAISED));
 
+        
+
         listCards = new ArrayList<>();
         previousCard = null;
         int x = 0;
 
+        System.out.println("listShuffle: " + listShuffle.get(x));
+
         for(int i = 0; i < gridCol; i++){
+            System.out.println("i: " + i);
             for(int j = 0; j < gridRow; j++){
-                // System.out.println("x: " + x);
-                Integer numShuffle = (Integer) listShuffle.get(x);
+                System.out.println("j: " + j);
+
+                Integer numShuffle = listShuffle.get(x);
+                System.out.println("listShuffle: " + listShuffle.get(x));
                 x++;
+                System.out.println("x: " + x);
 
                 buttonCard currentCard = new buttonCard(numShuffle);
-                // System.out.println("listShuffle: " + listShuffle.get(x));
+                
                 currentCard.setIcon(gameDeck.getCard(-1, level));
                 
                 GridBagConstraints c = new GridBagConstraints();
@@ -310,7 +326,7 @@ public class Memory {
         // }
         // catch(Exception ex){System.out.println("Exception:" + ex);}
 
-        frame.add(panelGrid,BorderLayout.CENTER);
+        
     }
 
     // ================================================ TIMER FEATURE ================================================
@@ -383,6 +399,8 @@ public class Memory {
     }
 
     private void createShuffledNumbers(){
+        System.out.println("createShuffledNumbers called" + "numCards: " + numCards);
+        listShuffle = new ArrayList<>();
         if(round != 0)
         {
             listShuffle.clear();
@@ -432,38 +450,42 @@ public class Memory {
     
     
             
-    private void setupLevel(int numCards, int gridCol, int gridRow, int level){
-        numCards = this.numCards;
-        gridCol = this.gridCol;
-        gridRow = this.gridRow;
-        level = this.level;
-
-        createShuffledNumbers();
+    private void setupLevel(){
+        // listShuffle = new ArrayList<>();
+        // createShuffledNumbers();
         if(round != 0) {
             if(level == 2) {
-                numCards = 20;
+                numCards = 10;
                 gridCol = 5;
                 gridRow = 4;
 
                 panelGrid.repaint();
             }
             else if(level == 3) {
-                numCards = 24;
+                numCards = 12;
                 gridCol = 6;
                 gridRow = 4;
 
                 panelGrid.repaint();
             } 
             else {
-                numCards = 12;
+                numCards = 6;
                 gridCol = 4;
                 gridRow = 3;
 
                 panelGrid.repaint();
             }
         }
-
+        else {
+            numCards = 6;
+            gridCol = 4;
+            gridRow = 3;
+        }
+        createShuffledNumbers();
         round++;
+
+        System.out.println("listShuffle: " + listShuffle.toString());
+        System.out.println("numCards: " + numCards + " gridCol: " + gridCol + " gridRow: " + gridRow + " level: " + level);
 
     }
 
