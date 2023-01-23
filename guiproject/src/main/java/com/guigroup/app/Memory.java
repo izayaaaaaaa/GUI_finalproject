@@ -1,6 +1,6 @@
-// put a congratulatory when fully solved!
+// no clicks counter!!
+// start -> new game -> solve (cheat/bug)
 package com.guigroup.app;
-
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+// import java.util.logging.Level;
+// import java.util.logging.Logger;
 
 import javax.swing.*;
 import javax.swing.BorderFactory;
@@ -26,155 +28,59 @@ import javax.swing.border.BevelBorder;
 import javax.swing.Timer;
 
 public class Memory {
+    // ================================================ VARIABLE INITIALIZATION ================================================
+
     private JFrame frame;
-    private JPanel panelTitle, panelGrid, panelControl;
-    private JButton buttonNew, buttonSolve, buttonStart;
-
-    private buttonGame buttonLastClicked;
-    // private Deck easyDeck, mediumDeck, 
-    private Deck hardDeck;
     
-    private JLabel labelTimer;
-    
-    Integer intCombined;
-    ArrayList<Integer>  listShuffle;
+    private Deck gameDeck;
 
-    
-    private List<buttonGame> listButtons;
+    ArrayList<Integer> listShuffle;
+    private List<buttonCard> listCards;
 
-    private Timer timer, timer2;
-    private int timeLeft; // in secs
-    private boolean gameTimerStart = false; // Cards cannot be flipped if false.
+    Integer numCorrectPairs;
 
     private JMenuBar menuBar;
     private JMenu levelsMenu, optionsMenu;
     private JMenuItem easyItem, mediumItem, hardItem, aboutItem, exitItem;
-
-    public Memory(){ 
-        // easyDeck = new Deck(1);
-        // mediumDeck = new Deck(2);
-        hardDeck = new Deck(3);
-
-        intCombined = 0;
-
-        listShuffle = new ArrayList<>();
-
-        for (int i = 1; i <= 12; i++) {
-            listShuffle.add(i);
-            listShuffle.add(i);
-        }
-        Collections.shuffle(listShuffle);
-
-    }
     
-    private class buttonGame extends JButton{
-        Integer iCod;
-        public buttonGame(Integer iCod){
-            this.iCod = iCod;
-        }
-    }
-    
-    private void enlargeFont(java.awt.Component c, float factor) {
-        c.setFont(c.getFont().deriveFont(c.getFont().getSize() * factor));
-    }
-    
-    private void countdown(){ // Starts the timer
-        timeLeft= 11;
-        timer = new Timer(1000, new TimerListener()); // fire every second
-        timer.start();
-    }
-    
-    private class TimerListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            timeLeft--;
-            labelTimer.setText("Countdown: " + timeLeft);
+    private JPanel panelTitle, panelGrid, panelControl;
+    private JButton buttonNew, buttonSolve, buttonStart;
 
-            if (timeLeft == 0 && gameTimerStart == false) {
-                timer2.stop();
-                gameTimerStart = true;
-                for(int i = 0; i < listButtons.size();i++){
-                    buttonGame button = listButtons.get(i);
-                    button.setIcon(hardDeck.IconFactory(-1));
-                }
-                Start();
-            }
-            else if(timeLeft == 0) {
-                timer.stop();
-                Solve(true);
-            }
-        }
+    private JLabel labelTimer;
+    private Timer timer, timer2;
+    private int timeLeft; // in secs
+    private boolean gameTimerStart = false; 
+
+    private buttonCard previousCard;
+
+    private int round, level, gridRow, gridCol, numCards;
+    
+    
+    // ================================================ COMPILE RUN THROUGH ================================================
+    Memory(){
+        level = 1;
+        round = 0;
+        gameDeck = new Deck(level);
+        numCorrectPairs = 0;
     }
 
-    private void showCard(){
-        timeLeft= 5;
-        timer2 = new Timer(1000, new TimerListener()); // fire every second
-        timer2.start();
-        for(int i = 0; i < listButtons.size();i++){
-            buttonGame button = listButtons.get(i);
-            button.setIcon(hardDeck.IconFactory((Integer) listShuffle.get(i)));
-        }
-    }
-
-    private void Solve(Boolean bMostrarCliques){
-        timer.stop();
-        intCombined = 12;
-        buttonLastClicked = null;
-        
-        for(int i = 0; i < listButtons.size();i++){
-            buttonGame button = listButtons.get(i);
-            button.setIcon(hardDeck.IconFactory((Integer) listShuffle.get(i)));
-            button.iCod = 0;
-            listButtons.set(i, button);
-        }
-        panelGrid.repaint();
-    }
-    
-    private void NewGame(){
-        try{
-            if(timer2.isRunning()){
-                timer2.stop();
-                labelTimer.setText("Countdown: 0");
-            }
-            else if(timer.isRunning()){
-                timer.stop();
-            }
-        }catch(Exception e){
-            System.out.println("Exception:"+e);
-        }
-
-        gameTimerStart = false;
-        Collections.shuffle(listShuffle);
-        intCombined = 0;
-        buttonLastClicked = null;
-        
-        for(int i = 0; i < listButtons.size();i++){
-            buttonGame button = listButtons.get(i);
-            button.iCod = (Integer) listShuffle.get(i);
-            button.setIcon(hardDeck.IconFactory(-1));
-            listButtons.set(i, button);
-        }
-        
-        panelGrid.repaint();
-            
-    }
-            
-    private void Start(){
-        if(gameTimerStart == false){
-            showCard();
-                
-        }
-        if(gameTimerStart == true){
-            countdown();
-            buttonSolve.setVisible(true);
-        } 
-    }
-    
-    public void ShowWindow(){
+    public void createGUI(){
         frame = new JFrame("Memory");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
         
+        createMenuBar(); 
+        createPanelTitle();
+        createPanelControl();
+        setupLevel(6, 4, 3, level);
+        createPanelGrid();
+        
+        frame.pack();
+        frame.setMinimumSize(frame.getPreferredSize());
+        frame.setVisible(true);
+    }
+
+    private void createMenuBar(){
         // Menu
         menuBar = new JMenuBar();
         
@@ -201,19 +107,25 @@ public class Memory {
         easyItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Easy");
+                gameDeck = new Deck(1);
+                
+
             }
         });
         mediumItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Medium");
+                gameDeck = new Deck(2);
+                level = 2;
+                System.out.println("Deck Level " + level);
             }
         });
         hardItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Hard");
+                gameDeck = new Deck(3);
+                level = 3;
+                System.out.println("Deck Level " + level);
             }
         });
         aboutItem.addActionListener(new ActionListener() {
@@ -230,33 +142,38 @@ public class Memory {
                 System.exit(0);
             }
         });
-        
+    }
 
+    private void createPanelTitle(){
         // Title
         labelTimer = new JLabel("Countdown:" + timeLeft);
         enlargeFont(labelTimer, 2);
         
         panelTitle = new JPanel(new GridLayout());
         panelTitle.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-
-
         panelTitle.add(labelTimer);
+
         frame.add(panelTitle,BorderLayout.NORTH);
-        
+    }
+
+    private void createPanelControl(){
         // Controls
         panelControl = new JPanel(new FlowLayout(FlowLayout.CENTER, 50, 0));
         panelControl.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+
         buttonNew = new JButton("New Game");
         enlargeFont(buttonNew, 2);
         panelControl.add(buttonNew);
+
         buttonSolve = new JButton("Solve");
         enlargeFont(buttonSolve, 2);
         panelControl.add(buttonSolve);
+
         buttonStart = new JButton("Start");
         enlargeFont(buttonStart, 2);
         panelControl.add(buttonStart);
+
         frame.add(panelControl,BorderLayout.SOUTH);
-        
 
         buttonNew.addMouseListener(new MouseListener() {
             @Override
@@ -319,84 +236,252 @@ public class Memory {
             @Override
             public void mouseExited(MouseEvent e) {}
         });
+    }
 
-        // grid principal
+    private void createPanelGrid(){
         panelGrid = new JPanel(new GridBagLayout());
         panelGrid.setBorder(new BevelBorder(BevelBorder.RAISED));
-        // 6 x 4 = 24 
-        // 24 have two possibilities of 12
-        listButtons = new ArrayList<>();
-        buttonLastClicked = null;
-        int x = 0;
-        for(int i = 0; i < 6; i++){
-            for(int j = 0; j < 4; j++){
-                Integer intNumSorteado = (Integer) listShuffle.get(x);
-                buttonGame buttonItem = new buttonGame(intNumSorteado);
-                
-                buttonItem.setIcon(hardDeck.IconFactory(-1));
-                x++;
-                
 
+        listCards = new ArrayList<>();
+        previousCard = null;
+        int x = 0;
+
+        for(int i = 0; i < gridCol; i++){
+            for(int j = 0; j < gridRow; j++){
+                // System.out.println("x: " + x);
+                Integer numShuffle = (Integer) listShuffle.get(x);
+                x++;
+
+                buttonCard currentCard = new buttonCard(numShuffle);
+                // System.out.println("listShuffle: " + listShuffle.get(x));
+                currentCard.setIcon(gameDeck.getCard(-1, level));
+                
                 GridBagConstraints c = new GridBagConstraints();
                 c.fill = GridBagConstraints.BOTH;
                 c.weightx = .5;
                 c.weighty = .5;
                 c.gridx = i;
                 c.gridy = j;
-                panelGrid.add(buttonItem, c);
-
-                listButtons.add(buttonItem);
                 
-                buttonItem.addActionListener(new ActionListener() {
+                panelGrid.add(currentCard, c);
+                listCards.add(currentCard);
+
+                currentCard.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        // done cards aren't clickable or flippable
-                        if(buttonItem.iCod == 0){
+                        if(currentCard.cardNo == 0){ // if done card, do nothing
                             return;
                         }
 
-                        // repeated click will do nothing
-                        if(buttonItem.equals(buttonLastClicked)) return;
+                        if(currentCard.equals(previousCard)) return; // repeated click, do nothing
                         
                         if(gameTimerStart == true){
-                            buttonItem.setIcon(hardDeck.IconFactory(buttonItem.iCod));
+                            currentCard.setIcon(gameDeck.getCard(currentCard.cardNo, level));
                                         
-                            if(buttonLastClicked == null){
-                                buttonLastClicked = buttonItem;
+                            if(previousCard == null){
+                                previousCard = currentCard;
                                 return;
                             }
 
-                            // logic for matching pairs
-                            if(Objects.equals(buttonItem.iCod, buttonLastClicked.iCod)){
+                            if(Objects.equals(currentCard.cardNo, previousCard.cardNo)){
 
-                                buttonItem.setIcon(hardDeck.IconFactory(0));
-                                buttonItem.iCod = 0;
+                                currentCard.setIcon(gameDeck.getCard(0, level));
+                                currentCard.cardNo = 0;
 
-                                buttonLastClicked.setIcon(hardDeck.IconFactory(0));
-                                buttonLastClicked.iCod = 0;
+                                previousCard.setIcon(gameDeck.getCard(0, level));
+                                previousCard.cardNo = 0;
 
-                                buttonLastClicked = null;
-                                intCombined++;
-                                if(intCombined >= 12){
+                                previousCard = null;
+                                numCorrectPairs++;
+
+                                if(numCorrectPairs >= numCards){
                                     Solve(true);
                                 }	
                             }
                             else {
-                                buttonLastClicked.setIcon(hardDeck.IconFactory(-1));
-                                buttonLastClicked = buttonItem;
+                                previousCard.setIcon(gameDeck.getCard(-1, level));
+                                previousCard = currentCard;
                             }
                         }
                     }
                 });
+            }       
+        }            
+        // }
+        // catch(Exception ex){System.out.println("Exception:" + ex);}
+
+        frame.add(panelGrid,BorderLayout.CENTER);
+    }
+
+    // ================================================ TIMER FEATURE ================================================
+
+    private void Start(){
+        if(gameTimerStart == false){
+            showCard();
+                
+        }
+        if(gameTimerStart == true){
+            countdown();
+            buttonSolve.setVisible(true);
+        } 
+    }
+
+    private void Solve(Boolean bMostrarCliques){
+        timer.stop();
+        
+        numCorrectPairs = numCards;
+        previousCard = null;
+        
+        for(int i = 0; i < listCards.size();i++){
+            buttonCard button = listCards.get(i);
+            button.setIcon(gameDeck.getCard((Integer) listShuffle.get(i), level));
+            button.cardNo = 0;
+            listCards.set(i, button);
+        }
+        panelGrid.repaint();
+    }
+    
+    private void NewGame(){
+        try{
+            if(timer2.isRunning()){
+                timer2.stop();
+                labelTimer.setText("Countdown: 0");
+            }
+            else if(timer.isRunning()){
+                timer.stop();
+            }
+        } catch(Exception e){
+            System.out.println("Exception:"+e);
+        }
+
+        gameTimerStart = false;
+        Collections.shuffle(listShuffle);
+        numCorrectPairs = 0;
+        
+        previousCard = null;
+        
+        for(int i = 0; i < listCards.size();i++){
+            buttonCard button = listCards.get(i);
+            button.cardNo = (Integer) listShuffle.get(i);
+            button.setIcon(gameDeck.getCard(-1, level));
+            listCards.set(i, button);
+        }
+        
+        panelGrid.repaint();
+            
+    }
+    
+    private void showCard(){
+        timeLeft= 5;
+        timer2 = new Timer(1000, new TimerListener()); // fire every second
+        timer2.start();
+        
+        for(int i = 0; i < listCards.size();i++){
+            buttonCard button = listCards.get(i);
+            button.setIcon(gameDeck.getCard((Integer) listShuffle.get(i), level));
+        }
+    }
+
+    private void createShuffledNumbers(){
+        if(round != 0)
+        {
+            listShuffle.clear();
+        }
+        
+        for (int i = 1; i <= numCards; i++) {
+            listShuffle.add(i);
+            listShuffle.add(i);
+        }
+        Collections.shuffle(listShuffle);
+    }
+
+    private void countdown(){ // Starts the timer
+        timeLeft= 11;
+        timer = new Timer(1000, new TimerListener()); // fire every second
+        timer.start();
+    }
+    
+    private class TimerListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // System.out.println("Time remaining: " + timeLeft + " seconds");  
+            timeLeft--;
+            labelTimer.setText("Countdown: " + timeLeft);
+
+            if (timeLeft == 0 && gameTimerStart == false) {
+                timer2.stop();
+                gameTimerStart = true;
+                System.out.println("gameTimerStart = true;");
+                for(int i = 0; i < listCards.size();i++){
+                    buttonCard button = listCards.get(i);
+                    button.setIcon(gameDeck.getCard(-1, level));
+                }
+                Start();
+            }
+            else if(timeLeft == 0) {
+                timer.stop();
+                Solve(true);
             }
         }
-        frame.add(panelGrid,BorderLayout.CENTER);
-        
-        
-        frame.pack();
-        frame.setMinimumSize(frame.getPreferredSize());
-        frame.setVisible(true);
     }
+
+    private void enlargeFont(java.awt.Component c, float factor) {
+        c.setFont(c.getFont().deriveFont(c.getFont().getSize() * factor));
+    }
+    
+    
+    
+            
+    private void setupLevel(int numCards, int gridCol, int gridRow, int level){
+        numCards = this.numCards;
+        gridCol = this.gridCol;
+        gridRow = this.gridRow;
+        level = this.level;
+
+        createShuffledNumbers();
+        if(round != 0) {
+            if(level == 2) {
+                numCards = 20;
+                gridCol = 5;
+                gridRow = 4;
+
+                panelGrid.repaint();
+            }
+            else if(level == 3) {
+                numCards = 24;
+                gridCol = 6;
+                gridRow = 4;
+
+                panelGrid.repaint();
+            } 
+            else {
+                numCards = 12;
+                gridCol = 4;
+                gridRow = 3;
+
+                panelGrid.repaint();
+            }
+        }
+
+        round++;
+
+    }
+
+    
+    
+    
+
+    
+
+    private class buttonCard extends JButton{
+        Integer cardNo;
+        public buttonCard(Integer cardNo){
+            this.cardNo = cardNo;
+        }
+    }
+    
+    
+   
     /**
      * @param args the command line arguments
      */
@@ -407,7 +492,7 @@ public class Memory {
             @Override
             public void run() {
                 Memory mem = new Memory();
-                mem.ShowWindow();
+                mem.createGUI();
                 
             }
         });

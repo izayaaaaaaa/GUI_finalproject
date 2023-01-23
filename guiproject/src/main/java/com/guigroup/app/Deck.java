@@ -1,7 +1,3 @@
-// new changes on this version:
-//  - fixed clicker 
-//  - generation of easy, medium and hard decks
-
 package com.guigroup.app;
 
 import java.awt.image.BufferedImage;
@@ -13,194 +9,109 @@ import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 public class Deck {
-    private final Map<Integer,Card> deck;
+    private final Map<Integer,String> mapeasyDeck, mapmediumDeck, maphardDeck;
     
-
     public Deck(int level){
-        deck = new HashMap<>();
+        mapeasyDeck = new HashMap<>();
+        mapmediumDeck = new HashMap<>();
+        maphardDeck = new HashMap<>();
 
         if(level == 2){
-            // medium level
             generateMediumDeck();
-        } else if(level == 3){
-            // hard level
-            generateHardDeck();
-        } else {
-            // easy level (default)
-            generateEasyDeck();
-        }
 
+        } else if(level == 3){
+            generateHardDeck();
+
+        } else {
+            generateEasyDeck();
+
+        }
     }
 
     private class Card {
         Integer cardNo;
         String filePath;
+        
         Card(Integer cardNo, String filePath){
             this.cardNo = cardNo;
             this.filePath = filePath;
         }
     }
 
-    public ImageIcon IconFactory(Integer cardNo){
-        if(!deck.containsKey(cardNo)) {
-            System.out.println("IconFactory problem");
-            return null;
+    private void createCard(Integer cardNo, String filePath, Map<Integer,String> deck){
+        Card card = new Card(cardNo, filePath);
+        deck.put(card.cardNo, card.filePath);
+    }
+
+    public ImageIcon getCard(Integer cardNo, Integer deckLevel){
+        Map<Integer,String> deck;
+        // identify which deck will the card come from
+        if(deckLevel == 2){
+            deck = mapmediumDeck;
+        } else if(deckLevel == 3){
+            deck = maphardDeck;
+        } else {
+            deck = mapeasyDeck;
         }
+
         try {
-            BufferedImage cardImg = ImageIO.read(getClass().getClassLoader().getResource(deck.get(cardNo).filePath));
-            // System.out.println("Current Image URL: " + getClass().getClassLoader().getResource(deck.get(cardNo).filePath).toString());
+            BufferedImage cardImg = ImageIO.read(getClass().getClassLoader().getResource(deck.get(cardNo)));
+            // System.out.println("Current Image URL: " + getClass().getClassLoader().getResource(deck.get(cardNo)).toString());
             return new ImageIcon(cardImg);
-        } catch (IOException e) {
+        } 
+        catch (IOException e) {
+            if(!deck.containsKey(cardNo)) {
+                System.out.println("Card not found");
+                return null;
+            }
             e.printStackTrace();
             return null;
         }
     }
 
     private void generateEasyDeck(){
-        Card card;
         int i = -1;
-
-        // undiscovered image
-        card = new Card(i++,"images/ic_help_outline_black_18dp.png"); 
-        deck.put(card.cardNo, card);        
-
-        // discovered image
-        card = new Card(i++,"images/ic_done_black_18dp.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m2.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m3.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m4.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m5.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m6.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m7.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m8.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m9.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m10.png");
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m11.png");
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m12.png");
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m13.png");
-        deck.put(card.cardNo, card);
+        createCard(i++, "images/ic_help_outline_black_18dp.png", mapeasyDeck);
+        createCard(i++, "images/ic_done_black_18dp.png", mapeasyDeck);
+        createCard(i++, "images/m2.png", mapeasyDeck);
+        createCard(i++, "images/m3.png", mapeasyDeck);
+        createCard(i++, "images/m4.png", mapeasyDeck);
+        createCard(i++, "images/m5.png", mapeasyDeck);
+        createCard(i++, "images/m6.png", mapeasyDeck); 
+        createCard(i++, "images/m7.png", mapeasyDeck);
     }
 
     private void generateMediumDeck(){
-        Card card;
         int i = -1;
 
-        // undiscovered image
-        card = new Card(i++,"images/ic_help_outline_black_18dp.png"); 
-        deck.put(card.cardNo, card);        
-
-        // discovered image
-        card = new Card(i++,"images/ic_done_black_18dp.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m2.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m3.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m4.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m5.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m6.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m7.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m8.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m9.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m10.png");
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m11.png");
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m12.png");
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m13.png");
-        deck.put(card.cardNo, card);
+        createCard(i++, "images/ic_help_outline_black_18dp.png", mapmediumDeck);
+        createCard(i++, "images/ic_done_black_18dp.png", mapmediumDeck);
+        createCard(i++, "images/m2.png", mapmediumDeck);
+        createCard(i++, "images/m3.png", mapmediumDeck);
+        createCard(i++, "images/m4.png", mapmediumDeck);
+        createCard(i++, "images/m5.png", mapmediumDeck);
+        createCard(i++, "images/m6.png", mapmediumDeck);
+        createCard(i++, "images/m7.png", mapmediumDeck);
+        createCard(i++, "images/m8.png", mapmediumDeck);
+        createCard(i++, "images/m9.png", mapmediumDeck);
     }
-
+    
     private void generateHardDeck(){
-        Card card;
+        // generate 12 cards
         int i = -1;
-
-        // undiscovered image
-        card = new Card(i++,"images/ic_help_outline_black_18dp.png"); 
-        deck.put(card.cardNo, card);        
-
-        // discovered image
-        card = new Card(i++,"images/ic_done_black_18dp.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m2.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m3.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m4.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m5.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m6.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m7.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m8.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m9.png"); 
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m10.png");
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m11.png");
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m12.png");
-        deck.put(card.cardNo, card);        
-
-        card = new Card(i++,"images/m13.png");
-        deck.put(card.cardNo, card);        
-         
+        createCard(i++, "images/ic_help_outline_black_18dp.png", maphardDeck);
+        createCard(i++, "images/ic_done_black_18dp.png", maphardDeck);
+        createCard(i++, "images/m2.png", maphardDeck);
+        createCard(i++, "images/m3.png", maphardDeck);
+        createCard(i++, "images/m4.png", maphardDeck);
+        createCard(i++, "images/m5.png", maphardDeck);
+        createCard(i++, "images/m6.png", maphardDeck);
+        createCard(i++, "images/m7.png", maphardDeck);
+        createCard(i++, "images/m8.png", maphardDeck);
+        createCard(i++, "images/m9.png", maphardDeck);
+        createCard(i++, "images/m10.png", maphardDeck);
+        createCard(i++, "images/m11.png", maphardDeck);
+        createCard(i++, "images/m12.png", maphardDeck);
     }
+
 }
