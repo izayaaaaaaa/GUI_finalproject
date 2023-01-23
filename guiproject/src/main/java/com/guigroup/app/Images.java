@@ -46,41 +46,42 @@ public class Images {
         mapa.put(item.intCod, item);        
 
 
-        item = new Item(i++,"images/ic_airport_shuttle_black_18dp.png");
+        item = new Item(i++,"images/m2.png");
         mapa.put(item.intCod, item);        
 
-        item = new Item(i++,"images/ic_all_inclusive_black_18dp.png");
+        item = new Item(i++,"images/m3.png");
         mapa.put(item.intCod, item);        
 
-        item = new Item(i++,"images/ic_beach_access_black_18dp.png");
+        item = new Item(i++,"images/m4.png");
         mapa.put(item.intCod, item);        
 
-        item = new Item(i++,"images/ic_business_center_black_18dp.png");
+        item = new Item(i++,"images/m5.png");
         mapa.put(item.intCod, item);        
 
-        item = new Item(i++,"images/ic_casino_black_18dp.png");
+        item = new Item(i++,"images/m6.png");
         mapa.put(item.intCod, item);        
 
-        item = new Item(i++,"images/ic_child_care_black_18dp.png");
+        item = new Item(i++,"images/m7.png");
         mapa.put(item.intCod, item);        
 
-        item = new Item(i++,"images/ic_child_friendly_black_18dp.png");
+        item = new Item(i++,"images/m8.png");
         mapa.put(item.intCod, item);        
 
-        item = new Item(i++,"images/ic_fitness_center_black_18dp.png");
+        item = new Item(i++,"images/m9.png");
         mapa.put(item.intCod, item);        
 
-        item = new Item(i++,"images/ic_free_breakfast_black_18dp.png");
+        item = new Item(i++,"images/m10.png");
         mapa.put(item.intCod, item);        
 
-        item = new Item(i++,"images/ic_hot_tub_black_18dp.png");
+        item = new Item(i++,"images/m11.png");
         mapa.put(item.intCod, item);        
 
-        item = new Item(i++,"images/ic_kitchen_black_18dp.png");
+        item = new Item(i++,"images/m12.png");
         mapa.put(item.intCod, item);        
 
-        item = new Item(i++,"images/ic_pool_black_18dp.png");
+        item = new Item(i++,"images/m13.png");
         mapa.put(item.intCod, item);        
+         
     }
     
 }
