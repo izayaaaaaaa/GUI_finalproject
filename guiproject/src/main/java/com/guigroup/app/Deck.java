@@ -71,8 +71,8 @@ public class Deck {
 
     private void generateEasyDeck(){
         int i = -1;
-        createCard(i++, "images/ic_help_outline_black_18dp.png", mapeasyDeck);
-        createCard(i++, "images/ic_done_black_18dp.png", mapeasyDeck);
+        createCard(i++, "images/qm.png", mapeasyDeck);
+        createCard(i++, "images/c.png", mapeasyDeck);
         createCard(i++, "images/m2.png", mapeasyDeck);
         createCard(i++, "images/m3.png", mapeasyDeck);
         createCard(i++, "images/m4.png", mapeasyDeck);
@@ -84,8 +84,8 @@ public class Deck {
     private void generateMediumDeck(){
         int i = -1;
 
-        createCard(i++, "images/ic_help_outline_black_18dp.png", mapmediumDeck);
-        createCard(i++, "images/ic_done_black_18dp.png", mapmediumDeck);
+        createCard(i++, "images/qm.png", mapmediumDeck);
+        createCard(i++, "images/c.png", mapmediumDeck);
         createCard(i++, "images/m2.png", mapmediumDeck);
         createCard(i++, "images/m3.png", mapmediumDeck);
         createCard(i++, "images/m4.png", mapmediumDeck);
@@ -99,8 +99,8 @@ public class Deck {
     private void generateHardDeck(){
         // generate 12 cards
         int i = -1;
-        createCard(i++, "images/ic_help_outline_black_18dp.png", maphardDeck);
-        createCard(i++, "images/ic_done_black_18dp.png", maphardDeck);
+        createCard(i++, "images/qm.png", maphardDeck);
+        createCard(i++, "images/c.png", maphardDeck);
         createCard(i++, "images/m2.png", maphardDeck);
         createCard(i++, "images/m3.png", maphardDeck);
         createCard(i++, "images/m4.png", maphardDeck);

@@ -5,9 +5,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+// import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,6 +22,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
 import javax.swing.Timer;
 
 public class Memory {
@@ -42,7 +44,7 @@ public class Memory {
     JPanel panelTitle, panelGrid, panelControl;
     private JButton buttonNew, buttonSolve, buttonStart;
 
-    private JLabel labelTimer;
+    private JLabel labelTitle, labelTimer;
     private Timer timer, timer2;
     private int timeLeft; // in secs
     private boolean gameTimerStart = false; 
@@ -157,8 +159,8 @@ public class Memory {
         });
         aboutItem.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("About");
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                 JOptionPane.showMessageDialog(frame, "Match Monster V.1.01 \nMatch the tiles before the timer runs out!");
             }
         });
 
@@ -172,17 +174,25 @@ public class Memory {
     }
 
     private void createPanelTitle(){
-        labelTimer = new JLabel("Countdown:" + timeLeft);
+        labelTitle = new JLabel("Match Monsters");
+        labelTitle.setForeground(Color.white);
+        enlargeFont(labelTitle, 3);
+        
+        labelTimer = new JLabel("Countdown: " + timeLeft);
+        labelTimer.setForeground(Color.white);
         enlargeFont(labelTimer, 2);
         
-        panelTitle = new JPanel(new GridLayout());
+        panelTitle = new JPanel(new FlowLayout(FlowLayout.LEFT, 50, 30));
         panelTitle.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        panelTitle.setBackground(Color.decode("#042243"));
+        panelTitle.add(labelTitle);
         panelTitle.add(labelTimer);
         frame.add(panelTitle,BorderLayout.NORTH);
     }
 
-    private void createPanelControl(){
-        panelControl = new JPanel(new FlowLayout(FlowLayout.CENTER, 50, 0));
+    private void createPanelControl(){   
+        panelControl = new JPanel(new FlowLayout(FlowLayout.CENTER, 50, 20));
+        panelControl.setBackground(Color.decode("#042243"));
         panelControl.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 
         buttonNew = new JButton("New Game");
@@ -263,8 +273,10 @@ public class Memory {
     }
 
     private void createPanelGrid(){
-        panelGrid = new JPanel(new GridBagLayout());
-        panelGrid.setBorder(new BevelBorder(BevelBorder.RAISED));
+        panelGrid = new JPanel();
+        panelGrid.setBackground(Color.decode("#042243"));
+        panelGrid.setLayout(new GridLayout(0,4,20,20));
+        panelGrid.setBorder(new EmptyBorder(20, 50, 20, 50));
 
         listCards = new ArrayList<>();
         previousCard = null;
