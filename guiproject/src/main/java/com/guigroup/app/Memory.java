@@ -1,5 +1,4 @@
-// no clicks counter!!
-// start -> new game -> solve (cheat/bug)
+// put a congratulatory when fully solved!
 package com.guigroup.app;
 
 import java.awt.event.ActionEvent;
@@ -32,11 +31,11 @@ public class Memory {
     private JButton buttonNew, buttonSolve, buttonStart;
 
     private buttonGame buttonLastClicked;
-    private final Images imagens;
+    // private Deck easyDeck, mediumDeck, 
+    private Deck hardDeck;
     
-    private JLabel labelTitle, labelTimer;
+    private JLabel labelTimer;
     
-    Integer intQtdOpened;
     Integer intCombined;
     ArrayList<Integer>  listShuffle;
 
@@ -50,21 +49,12 @@ public class Memory {
     private JMenuBar menuBar;
     private JMenu levelsMenu, optionsMenu;
     private JMenuItem easyItem, mediumItem, hardItem, aboutItem, exitItem;
-    
-    private class buttonGame extends JButton{
-        Integer iCod;
-        public buttonGame(Integer iCod){
-            this.iCod = iCod;
-        }
-    }
-    
-    private void enlargeFont(java.awt.Component c, float factor) {
-        c.setFont(c.getFont().deriveFont(c.getFont().getSize() * factor));
-    }
-    
+
     public Memory(){ 
-        imagens = new Images();
-        intQtdOpened = 0;
+        // easyDeck = new Deck(1);
+        // mediumDeck = new Deck(2);
+        hardDeck = new Deck(3);
+
         intCombined = 0;
 
         listShuffle = new ArrayList<>();
@@ -77,6 +67,17 @@ public class Memory {
 
     }
     
+    private class buttonGame extends JButton{
+        Integer iCod;
+        public buttonGame(Integer iCod){
+            this.iCod = iCod;
+        }
+    }
+    
+    private void enlargeFont(java.awt.Component c, float factor) {
+        c.setFont(c.getFont().deriveFont(c.getFont().getSize() * factor));
+    }
+    
     private void countdown(){ // Starts the timer
         timeLeft= 11;
         timer = new Timer(1000, new TimerListener()); // fire every second
@@ -86,17 +87,15 @@ public class Memory {
     private class TimerListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            System.out.println("Time remaining: " + timeLeft + " seconds");  
             timeLeft--;
             labelTimer.setText("Countdown: " + timeLeft);
 
             if (timeLeft == 0 && gameTimerStart == false) {
                 timer2.stop();
                 gameTimerStart = true;
-                System.out.println("gameTimerStart = true;");
                 for(int i = 0; i < listButtons.size();i++){
                     buttonGame button = listButtons.get(i);
-                    button.setIcon(imagens.IconFactory(-1));
+                    button.setIcon(hardDeck.IconFactory(-1));
                 }
                 Start();
             }
@@ -113,23 +112,18 @@ public class Memory {
         timer2.start();
         for(int i = 0; i < listButtons.size();i++){
             buttonGame button = listButtons.get(i);
-            button.setIcon(imagens.IconFactory((Integer) listShuffle.get(i)));
+            button.setIcon(hardDeck.IconFactory((Integer) listShuffle.get(i)));
         }
     }
 
     private void Solve(Boolean bMostrarCliques){
         timer.stop();
-        if(intQtdOpened == -1) return;
-        labelTitle.setText("Number of Clicks: " + 
-            (bMostrarCliques? intQtdOpened.toString():"Auto Resolution"));
-
-        intQtdOpened = -1;
         intCombined = 12;
         buttonLastClicked = null;
         
         for(int i = 0; i < listButtons.size();i++){
             buttonGame button = listButtons.get(i);
-            button.setIcon(imagens.IconFactory((Integer) listShuffle.get(i)));
+            button.setIcon(hardDeck.IconFactory((Integer) listShuffle.get(i)));
             button.iCod = 0;
             listButtons.set(i, button);
         }
@@ -151,20 +145,17 @@ public class Memory {
 
         gameTimerStart = false;
         Collections.shuffle(listShuffle);
-        intQtdOpened = 0;
         intCombined = 0;
-        labelTitle.setText("Number of Clicks: 0");
         buttonLastClicked = null;
         
         for(int i = 0; i < listButtons.size();i++){
             buttonGame button = listButtons.get(i);
             button.iCod = (Integer) listShuffle.get(i);
-            button.setIcon(imagens.IconFactory(-1));
+            button.setIcon(hardDeck.IconFactory(-1));
             listButtons.set(i, button);
         }
         
         panelGrid.repaint();
-        System.out.println("New game starting...");
             
     }
             
@@ -207,7 +198,6 @@ public class Memory {
         menuBar.add(optionsMenu);
         frame.setJMenuBar(menuBar);
 
-        // action listener for each menu item
         easyItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -243,8 +233,6 @@ public class Memory {
         
 
         // Title
-        labelTitle = new JLabel("Number of Clicks: 0");
-        enlargeFont(labelTitle, 2);
         labelTimer = new JLabel("Countdown:" + timeLeft);
         enlargeFont(labelTimer, 2);
         
@@ -252,13 +240,11 @@ public class Memory {
         panelTitle.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 
 
-        panelTitle.add(labelTitle);
         panelTitle.add(labelTimer);
         frame.add(panelTitle,BorderLayout.NORTH);
         
         // Controls
-        panelControl = new JPanel(new FlowLayout(FlowLayout.CENTER
-                        , 50, 0));
+        panelControl = new JPanel(new FlowLayout(FlowLayout.CENTER, 50, 0));
         panelControl.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
         buttonNew = new JButton("New Game");
         enlargeFont(buttonNew, 2);
@@ -347,7 +333,7 @@ public class Memory {
                 Integer intNumSorteado = (Integer) listShuffle.get(x);
                 buttonGame buttonItem = new buttonGame(intNumSorteado);
                 
-                buttonItem.setIcon(imagens.IconFactory(-1));
+                buttonItem.setIcon(hardDeck.IconFactory(-1));
                 x++;
                 
 
@@ -364,29 +350,29 @@ public class Memory {
                 buttonItem.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
+                        // done cards aren't clickable or flippable
                         if(buttonItem.iCod == 0){
                             return;
                         }
-                        // rule
-                        // if there was a repeated click on the same button it is not worth...
-                        if(buttonItem.equals(buttonLastClicked)) return;
 
-                        labelTitle.setText("Number of Clicks: " + ++intQtdOpened);
+                        // repeated click will do nothing
+                        if(buttonItem.equals(buttonLastClicked)) return;
                         
                         if(gameTimerStart == true){
-                            buttonItem.setIcon(imagens.IconFactory(buttonItem.iCod));
+                            buttonItem.setIcon(hardDeck.IconFactory(buttonItem.iCod));
                                         
                             if(buttonLastClicked == null){
                                 buttonLastClicked = buttonItem;
                                 return;
                             }
 
+                            // logic for matching pairs
                             if(Objects.equals(buttonItem.iCod, buttonLastClicked.iCod)){
 
-                                buttonItem.setIcon(imagens.IconFactory(0));
+                                buttonItem.setIcon(hardDeck.IconFactory(0));
                                 buttonItem.iCod = 0;
 
-                                buttonLastClicked.setIcon(imagens.IconFactory(0));
+                                buttonLastClicked.setIcon(hardDeck.IconFactory(0));
                                 buttonLastClicked.iCod = 0;
 
                                 buttonLastClicked = null;
@@ -396,7 +382,7 @@ public class Memory {
                                 }	
                             }
                             else {
-                                buttonLastClicked.setIcon(imagens.IconFactory(-1));
+                                buttonLastClicked.setIcon(hardDeck.IconFactory(-1));
                                 buttonLastClicked = buttonItem;
                             }
                         }
