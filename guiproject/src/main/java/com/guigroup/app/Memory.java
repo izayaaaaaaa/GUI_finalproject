@@ -435,12 +435,15 @@ public class Memory {
         if (isTimerRunning == false) {
             // show cards
             showCardsRemaining = defaultShowCardsTime;
-            levelsMenu.setVisible(false); // avoid showtimer bug with level options
+            newGameItem.setVisible(false);
+            buttonNew.setVisible(false);
             flipCards("show");
 
             showCardsTimer = new Timer(1000, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {        
+                    // avoid show timer bugs
+                    levelsMenu.setVisible(false); 
                     
                     // Show Cards Timer
                     showCardsRemaining--;
@@ -449,8 +452,13 @@ public class Memory {
                     if(showCardsRemaining == 0) {
                         showCardsTimer.stop();
                         
+                        solveGameItem.setVisible(true);
                         buttonSolve.setVisible(true); 
-                        levelsMenu.setVisible(true); 
+
+                        levelsMenu.setVisible(true);
+
+                        newGameItem.setVisible(true);
+                        buttonNew.setVisible(true); 
 
                         labelTimer.setText("Game!");
                         showCardsRemaining = defaultShowCardsTime;
