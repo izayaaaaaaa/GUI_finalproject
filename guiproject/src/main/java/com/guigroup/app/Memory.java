@@ -2,7 +2,9 @@
 
 package com.guigroup.app;
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
@@ -70,7 +72,6 @@ public class Memory {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
         
-
         createMenuBar();
         createPanelTitle();
         createPanelControl();
@@ -78,6 +79,8 @@ public class Memory {
         
         frame.pack();
         frame.setVisible(true);
+        frame.setPreferredSize(new Dimension(650, 700));
+        frame.setMinimumSize(frame.getPreferredSize());
     }
 
     private void createMenuBar(){
@@ -167,15 +170,17 @@ public class Memory {
     private void createPanelTitle(){
         labelTitle = new JLabel("Match Monsters");
         labelTitle.setForeground(Color.white);
+        labelTitle.setFont(new Font("Futura", Font.BOLD, 12));
         enlargeFont(labelTitle, 3);
         
         labelTimer = new JLabel("Time Left: " + timeRemaining);
         labelTimer.setForeground(Color.white);
-        enlargeFont(labelTimer, 2);
+        labelTimer.setFont(new Font("Futura", Font.PLAIN, 12));
+        enlargeFont(labelTimer, 3);
         
         panelTitle = new JPanel(new FlowLayout(FlowLayout.LEFT, 50, 30));
         panelTitle.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
-        panelTitle.setBackground(Color.decode("#042243"));
+        panelTitle.setBackground(Color.decode("#1F8A70"));
         panelTitle.add(labelTitle);
         panelTitle.add(labelTimer);
         frame.add(panelTitle,BorderLayout.NORTH);
@@ -183,18 +188,22 @@ public class Memory {
 
     private void createPanelControl(){   
         panelControl = new JPanel(new FlowLayout(FlowLayout.CENTER, 50, 20));
-        panelControl.setBackground(Color.decode("#042243"));
+        panelControl.setBackground(Color.decode("#1F8A70"));
         panelControl.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
 
         buttonNew = new JButton("New Game");
+        buttonNew.setFont(new Font("Futura", Font.PLAIN, 12));
         enlargeFont(buttonNew, 2);
         panelControl.add(buttonNew);
 
         buttonSolve = new JButton("Solve");
+        buttonSolve.setFont(new Font("Futura", Font.PLAIN, 12));
         enlargeFont(buttonSolve, 2);
         panelControl.add(buttonSolve);
+        buttonSolve.setVisible(false);
 
         buttonStart = new JButton("Start");
+        buttonStart.setFont(new Font("Futura", Font.PLAIN, 12));
         enlargeFont(buttonStart, 2);
         panelControl.add(buttonStart);
         
@@ -254,7 +263,7 @@ public class Memory {
     private void createPanelGrid(){
         panelGrid = new JPanel();
         panelGrid.setBackground(Color.decode("#042243"));
-        panelGrid.setLayout(new GridLayout(0,4,20,20));
+        panelGrid.setLayout(new GridLayout(gridRow,gridCol,20,20));
         panelGrid.setBorder(new EmptyBorder(20, 50, 20, 50));
 
         listCards = new ArrayList<>();
@@ -271,8 +280,8 @@ public class Memory {
                 
                 GridBagConstraints c = new GridBagConstraints();
                 c.fill = GridBagConstraints.BOTH;
-                c.weightx = .5;
-                c.weighty = .5;
+                c.weightx = .8;
+                c.weighty = .8;
                 c.gridx = i;
                 c.gridy = j;
                 
@@ -386,12 +395,12 @@ public class Memory {
             timerTest.stop();
             isTimerRunning = false;
         }
-        
+        // numCorrectPairs = 0; DOUBLE CHECK!!!
         changeGrid(level);
         startGameItem.setVisible(true);
         solveGameItem.setVisible(true);
         buttonStart.setVisible(true);
-        buttonSolve.setVisible(true);
+        buttonSolve.setVisible(false); // double check the effect!!!
     }
 
     public void solveGameTest(){
@@ -440,6 +449,7 @@ public class Memory {
 
                     if(showCardsRemaining == 0) {
                         showCardsTimer.stop();
+                        buttonSolve.setVisible(true); // why? double check
                         labelTimer.setText("Game!");
                         showCardsRemaining = defaultShowCardsTime;
 
