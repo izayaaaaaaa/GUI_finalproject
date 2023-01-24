@@ -49,9 +49,8 @@ public class Memory {
 
     private JLabel labelTitle, labelTimer;
     private boolean isTimerRunning = false; 
-    private Integer timeRemaining;
+    private Integer timeRemaining, defaultShowCardsTime, showCardsRemaining;
     private Timer timerTest, showCardsTimer; 
-    int showCardsTimeLeft = 4;
 
     private buttonCard previousCard;
 
@@ -341,19 +340,22 @@ public class Memory {
             numCards = 10;
             gridCol = 5;
             gridRow = 4;
-            timeRemaining = 20;
+            timeRemaining = 15;
+            defaultShowCardsTime = 11;
         }
         else if(level == 3) {
             numCards = 12;
             gridCol = 6;
             gridRow = 4;
-            timeRemaining = 15;
+            timeRemaining = 10;
+            defaultShowCardsTime = 16;
         } 
         else {
             numCards = 6;
             gridCol = 4;
             gridRow = 3;
-            timeRemaining = 25;
+            timeRemaining = 20;
+            defaultShowCardsTime = 6;
         }
         createShuffledNumbers();
     }
@@ -416,27 +418,30 @@ public class Memory {
 
     public void startGameTest(){
         if (isTimerRunning == false) {
+            showCardsRemaining = defaultShowCardsTime;
+            System.out.println("showCardsRemaining acquired: " + showCardsRemaining);
+
+            for(int i = 0; i < listCards.size(); i++) {
+                buttonCard cardSolved = listCards.get(i);
+                cardSolved.setIcon(gameDeck.getCard(listShuffle.get(i), level));
+            }
+
+            frame.validate();
+            frame.repaint();
+
             showCardsTimer = new Timer(1000, new ActionListener() {
                 @Override
-                public void actionPerformed(ActionEvent e) {
-                    // Show Cards!!
-
-                    for(int i = 0; i < listCards.size(); i++) {
-                        buttonCard cardSolved = listCards.get(i);
-                        cardSolved.setIcon(gameDeck.getCard(listShuffle.get(i), level));
-                    }
-
-                    frame.validate();
-                    frame.repaint();
+                public void actionPerformed(ActionEvent e) {        
 
                     // Show Cards Timer
-                    showCardsTimeLeft--;
-                    labelTimer.setText("Get Ready! " + showCardsTimeLeft);
+                    showCardsRemaining--;
+                    labelTimer.setText("Get Ready! " + showCardsRemaining);
+                    System.out.println("showCardsRemaining: " + showCardsRemaining);
 
-                    if(showCardsTimeLeft == 0) {
+                    if(showCardsRemaining == 0) {
                         showCardsTimer.stop();
                         labelTimer.setText("Game!");
-                        showCardsTimeLeft = 4;
+                        showCardsRemaining = defaultShowCardsTime;
 
                         // Flip the cards back!
                         for(int i = 0; i < listCards.size(); i++) {
