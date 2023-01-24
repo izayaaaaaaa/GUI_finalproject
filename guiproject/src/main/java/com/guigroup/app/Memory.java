@@ -419,15 +419,33 @@ public class Memory {
             showCardsTimer = new Timer(1000, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    // Show Cards Timer                 
+                    // Show Cards!!
+
+                    for(int i = 0; i < listCards.size(); i++) {
+                        buttonCard cardSolved = listCards.get(i);
+                        cardSolved.setIcon(gameDeck.getCard(listShuffle.get(i), level));
+                    }
+
+                    frame.validate();
+                    frame.repaint();
+
+                    // Show Cards Timer
                     showCardsTimeLeft--;
                     labelTimer.setText("Get Ready! " + showCardsTimeLeft);
-                    System.out.println("showCardsTimeLeft: " + showCardsTimeLeft);
-                    
+
                     if(showCardsTimeLeft == 0) {
                         showCardsTimer.stop();
                         labelTimer.setText("Game!");
-                        // System.out.println("showCardsTimer stopped!");
+                        showCardsTimeLeft = 4;
+
+                        // Flip the cards back!
+                        for(int i = 0; i < listCards.size(); i++) {
+                            buttonCard cardSolved = listCards.get(i);
+                            cardSolved.setIcon(gameDeck.getCard(-1, level));
+                        }
+
+                        frame.validate();
+                        frame.repaint();
 
                         // Real Timer
                         labelTimer.setText("Time Left: " + timeRemaining);
@@ -436,23 +454,20 @@ public class Memory {
                             public void actionPerformed(ActionEvent e) {
                                 timeRemaining--;
                                 labelTimer.setText("Time Left: " + timeRemaining);
-                                // System.out.println("timeRemaining: " + timeRemaining);
 
                                 if(timeRemaining == 0) {
-                                    
                                     timerTest.stop();
                                     solveGameTest();
                                 }
                             }
                         });
                         timerTest.start();
+                        isTimerRunning = true; 
                     }
                 }
             });
             showCardsTimer.start();
             
-            
-            isTimerRunning = true;                    
             startGameItem.setVisible(false);
             buttonStart.setVisible(false);
         } 
