@@ -1,5 +1,3 @@
-// the relation of level menuitems and the game items can still be improved
-
 package com.guigroup.app;
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -50,7 +48,7 @@ public class Memory {
     private JButton buttonNew, buttonSolve, buttonStart;
 
     private JLabel labelTitle, labelTimer;
-    private boolean isTimerRunning = false; 
+    private boolean isTimerRunning = false, isShowCardsTimer = false; 
     private Integer timeRemaining, defaultShowCardsTime, showCardsRemaining;
     private Timer timerTest, showCardsTimer; 
 
@@ -77,7 +75,7 @@ public class Memory {
         
         // frame.pack();
         frame.setVisible(true);
-        frame.setPreferredSize(new Dimension(650, 700));
+        frame.setPreferredSize(new Dimension(700, 800));
         frame.setMinimumSize(frame.getPreferredSize());
     }
 
@@ -99,14 +97,19 @@ public class Memory {
         exitItem = new JMenuItem("Exit");
 
         gameMenu.add(newGameItem);
+        gameMenu.addSeparator();
         gameMenu.add(solveGameItem);
+        gameMenu.addSeparator();
         gameMenu.add(startGameItem);
 
         levelsMenu.add(easyItem);
+        levelsMenu.addSeparator();
         levelsMenu.add(mediumItem);
+        levelsMenu.addSeparator();
         levelsMenu.add(hardItem);
         
         optionsMenu.add(aboutItem);
+        optionsMenu.addSeparator();
         optionsMenu.add(exitItem);
         
         menuBar.add(gameMenu);
@@ -281,8 +284,8 @@ public class Memory {
                 
                 GridBagConstraints c = new GridBagConstraints();
                 c.fill = GridBagConstraints.BOTH;
-                c.weightx = .8;
-                c.weighty = .8;
+                c.weightx = .5;
+                c.weighty = .5;
                 c.gridx = i;
                 c.gridy = j;
                 
@@ -400,7 +403,10 @@ public class Memory {
             timerTest.stop();
             isTimerRunning = false;
         }
- 
+        else if(isShowCardsTimer == true){
+            showCardsTimer.stop();
+        }
+        numCorrectPairs = 0;
         changeGrid(level);
         
         startGameItem.setVisible(true);
@@ -435,16 +441,11 @@ public class Memory {
         if (isTimerRunning == false) {
             // show cards
             showCardsRemaining = defaultShowCardsTime;
-            newGameItem.setVisible(false);
-            buttonNew.setVisible(false);
             flipCards("show");
 
             showCardsTimer = new Timer(1000, new ActionListener() {
                 @Override
-                public void actionPerformed(ActionEvent e) {        
-                    // avoid show timer bugs
-                    levelsMenu.setVisible(false); 
-                    
+                public void actionPerformed(ActionEvent e) {                            
                     // Show Cards Timer
                     showCardsRemaining--;
                     labelTimer.setText("Get Ready! " + showCardsRemaining);
@@ -484,8 +485,9 @@ public class Memory {
                     }
                 }
             });
+            showCardsTimer.setInitialDelay(1);
             showCardsTimer.start();
-            
+            isShowCardsTimer = true;
             startGameItem.setVisible(false);
             buttonStart.setVisible(false);
         } 
