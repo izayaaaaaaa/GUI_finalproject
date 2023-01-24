@@ -8,7 +8,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
-// import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,9 +44,9 @@ public class Memory {
     private JButton buttonNew, buttonSolve, buttonStart;
 
     private JLabel labelTitle, labelTimer;
-    private Timer timer, timer2;
-    private int timeLeft; // in secs
-    private boolean gameTimerStart = false; 
+    private boolean isTimerRunning = false; 
+    private Integer timeRemaining;
+    private Timer timerTest; 
 
     private buttonCard previousCard;
 
@@ -55,9 +54,11 @@ public class Memory {
        
     // ================================================ COMPILE RUN THROUGH ================================================
     Memory(){
-        level = 1;
+        level = 2;
         gameDeck = new Deck(level);
         numCorrectPairs = 0;
+        setupLevel();
+
     }
 
     public void createGUI(){
@@ -65,14 +66,15 @@ public class Memory {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
         
+
         createMenuBar();
         createPanelTitle();
         createPanelControl();
-        setupLevel();
         createPanelGrid();
         
         frame.pack();
         frame.setVisible(true);
+        System.out.println("Is timer running? " + isTimerRunning);
     }
 
     private void createMenuBar(){
@@ -80,8 +82,8 @@ public class Memory {
         
         gameMenu = new JMenu("Game");
         newGameItem = new JMenuItem("New Game");
-        solveGameItem = new JMenuItem("Solve");
-        startGameItem = new JMenuItem("Start");
+        solveGameItem = new JMenuItem("Solve Game");
+        startGameItem = new JMenuItem("Start Game");
 
         levelsMenu = new JMenu("Levels");
         easyItem = new JMenuItem("Easy");
@@ -109,29 +111,61 @@ public class Memory {
 
         frame.setJMenuBar(menuBar);      
 
-        //generate one actionlistener for each game menu item
         newGameItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                newGameTest();
-                buttonStart.setVisible(true);
-                buttonSolve.setVisible(false);
+                if(isTimerRunning == true) {
+                    timerTest.stop();
+                    System.out.println("Is timer running when I do timerteststop? " + isTimerRunning);
+                    isTimerRunning = false;
+                }
+                
+                changeGrid(level);
+                startGameItem.setVisible(true);
+                solveGameItem.setVisible(true);
+                System.out.println("New Game!");
+                System.out.println("Is timer running? " + isTimerRunning);
+                
             }
         });
+
         solveGameItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                solveGameTest();
-                buttonStart.setVisible(false);
-                buttonSolve.setVisible(true);
+                if (isTimerRunning == true) {
+                    timerTest.stop();
+                    isTimerRunning = false;
+                    
+                }
+                
+                numCorrectPairs = numCards;
+                previousCard = null;
+
+                for(int i = 0; i < listCards.size(); i++) {
+                    buttonCard cardSolved = listCards.get(i);
+                    cardSolved.setIcon(gameDeck.getCard(listShuffle.get(i), level));
+                }
+
+                solveGameItem.setVisible(false);
+                startGameItem.setVisible(false);
+                frame.validate();
+                frame.repaint();
             }
         });
+
         startGameItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                startGameTest();
-                buttonStart.setVisible(false);
-                buttonSolve.setVisible(false);
+                if (isTimerRunning == false) {
+                    // showcard method()
+                    labelTimer.setText("Countdown: " + new TimerListenerTest());
+                    timerTest = new Timer(1000, new TimerListenerTest());
+                    timerTest.start();
+                    
+                    isTimerRunning = true;                    
+                    startGameItem.setVisible(false);
+                } 
+                                
             }
         });
 
@@ -178,7 +212,8 @@ public class Memory {
         labelTitle.setForeground(Color.white);
         enlargeFont(labelTitle, 3);
         
-        labelTimer = new JLabel("Countdown: " + timeLeft);
+        // labelTimer = new JLabel("Countdown: " + timeLeft);
+        labelTimer = new JLabel("Countdown: " + timeRemaining);
         labelTimer.setForeground(Color.white);
         enlargeFont(labelTimer, 2);
         
@@ -215,7 +250,7 @@ public class Memory {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                NewGame();
+                // NewGame();
                 buttonStart.setVisible(true);
                 buttonSolve.setVisible(false);
             }
@@ -236,7 +271,7 @@ public class Memory {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                Solve(false);
+                // Solve(false);
                 buttonStart.setVisible(false);
             }
 
@@ -256,7 +291,7 @@ public class Memory {
 
             @Override
             public void mousePressed(MouseEvent e) {
-                Start();
+                // Start();
                 buttonStart.setVisible(false);
                 buttonSolve.setVisible(false);
             }
@@ -307,7 +342,7 @@ public class Memory {
 
                         if(currentCard.equals(previousCard)) return; // repeated click, do nothing
                         
-                        if(gameTimerStart == true){
+                        if(isTimerRunning == true){
                             currentCard.setIcon(gameDeck.getCard(currentCard.cardNo, level));
                                         
                             if(previousCard == null){
@@ -326,7 +361,7 @@ public class Memory {
                                 numCorrectPairs++;
 
                                 if(numCorrectPairs >= numCards){
-                                    Solve(true);
+                                    // Solve(true);
                                 }	
                             }
                             else {
@@ -342,73 +377,6 @@ public class Memory {
         frame.add(panelGrid,BorderLayout.CENTER);
     }
 
-    private void Start(){
-        if(gameTimerStart == false){
-            showCard();
-                
-        }
-        if(gameTimerStart == true){
-            countdown();
-            buttonSolve.setVisible(true);
-        } 
-    }
-
-    private void Solve(Boolean bMostrarCliques){
-        timer.stop();
-        
-        numCorrectPairs = numCards;
-        previousCard = null;
-        
-        for(int i = 0; i < listCards.size();i++){
-            buttonCard button = listCards.get(i);
-            button.setIcon(gameDeck.getCard((Integer) listShuffle.get(i), level));
-            button.cardNo = 0;
-            listCards.set(i, button);
-        }
-        panelGrid.repaint();
-    }
-    
-    private void NewGame(){
-        try{
-            if(timer2.isRunning()){
-                timer2.stop();
-                labelTimer.setText("Countdown: 0");
-            }
-            else if(timer.isRunning()){
-                timer.stop();
-            }
-        } catch(Exception e){
-            System.out.println("Exception:"+e);
-        }
-
-        gameTimerStart = false;
-        Collections.shuffle(listShuffle);
-        numCorrectPairs = 0;
-        
-        previousCard = null;
-        
-        for(int i = 0; i < listCards.size();i++){
-            buttonCard button = listCards.get(i);
-            button.cardNo = (Integer) listShuffle.get(i);
-            button.setIcon(gameDeck.getCard(-1, level));
-            listCards.set(i, button);
-        }
-        
-        panelGrid.repaint();
-            
-    }
-    
-    private void showCard(){
-        timeLeft= 5;
-        timer2 = new Timer(1000, new TimerListener()); // fire every second
-        timer2.start();
-        
-        for(int i = 0; i < listCards.size();i++){
-            buttonCard button = listCards.get(i);
-            button.setIcon(gameDeck.getCard((Integer) listShuffle.get(i), level));
-        }
-    }
-
     private void createShuffledNumbers(){
         listShuffle = new ArrayList<>();
         
@@ -417,36 +385,6 @@ public class Memory {
             listShuffle.add(i);
         }
         Collections.shuffle(listShuffle);
-    }
-
-    private void countdown(){ // Starts the timer
-        timeLeft= 11;
-        timer = new Timer(1000, new TimerListener()); // fire every second
-        timer.start();
-    }
-    
-    private class TimerListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            // System.out.println("Time remaining: " + timeLeft + " seconds");  
-            timeLeft--;
-            labelTimer.setText("Countdown: " + timeLeft);
-
-            if (timeLeft == 0 && gameTimerStart == false) {
-                timer2.stop();
-                gameTimerStart = true;
-                System.out.println("gameTimerStart = true;");
-                for(int i = 0; i < listCards.size();i++){
-                    buttonCard button = listCards.get(i);
-                    button.setIcon(gameDeck.getCard(-1, level));
-                }
-                Start();
-            }
-            else if(timeLeft == 0) {
-                timer.stop();
-                Solve(true);
-            }
-        }
     }
 
     private void enlargeFont(java.awt.Component c, float factor) {
@@ -458,16 +396,19 @@ public class Memory {
             numCards = 10;
             gridCol = 5;
             gridRow = 4;
+            timeRemaining = 20;
         }
         else if(level == 3) {
             numCards = 12;
             gridCol = 6;
             gridRow = 4;
+            timeRemaining = 15;
         } 
         else {
             numCards = 6;
             gridCol = 4;
             gridRow = 3;
+            timeRemaining = 25;
         }
         createShuffledNumbers();
     }
@@ -483,7 +424,11 @@ public class Memory {
         gameDeck = new Deck(level);
         setupLevel();
         frame.remove(panelGrid);
+        frame.remove(panelTitle);
+        
         createPanelGrid();
+        createPanelTitle();
+
         frame.pack();
         frame.validate();
         frame.repaint();
@@ -495,7 +440,20 @@ public class Memory {
 
     public void startGameTest(){}
     
-    
+    private class TimerListenerTest implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            timeRemaining--;
+            labelTimer.setText("Countdown: " + timeRemaining);
+
+            if(timeRemaining == 0) {
+                
+                timerTest.stop();
+                solveGameTest();
+            }
+        }
+    }
+
     /**
      * @param args the command line arguments
      */

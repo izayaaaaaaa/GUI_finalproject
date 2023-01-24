@@ -45,7 +45,6 @@ public class Deck {
 
     public ImageIcon getCard(Integer cardNo, Integer deckLevel){
         Map<Integer,String> deck;
-        // identify which deck will the card come from
         if(deckLevel == 2){
             deck = mapmediumDeck;
         } else if(deckLevel == 3){
@@ -56,7 +55,6 @@ public class Deck {
 
         try {
             BufferedImage cardImg = ImageIO.read(getClass().getClassLoader().getResource(deck.get(cardNo)));
-            // System.out.println("Current Image URL: " + getClass().getClassLoader().getResource(deck.get(cardNo)).toString());
             return new ImageIcon(cardImg);
         } 
         catch (IOException e) {
@@ -94,6 +92,8 @@ public class Deck {
         createCard(i++, "images/m7.png", mapmediumDeck);
         createCard(i++, "images/m8.png", mapmediumDeck);
         createCard(i++, "images/m9.png", mapmediumDeck);
+        createCard(i++, "images/m10.png", mapmediumDeck);
+        createCard(i++, "images/m11.png", mapmediumDeck);
     }
     
     private void generateHardDeck(){
@@ -112,6 +112,7 @@ public class Deck {
         createCard(i++, "images/m10.png", maphardDeck);
         createCard(i++, "images/m11.png", maphardDeck);
         createCard(i++, "images/m12.png", maphardDeck);
+        createCard(i++, "images/m13.png", maphardDeck);
     }
 
 }
