@@ -1,28 +1,32 @@
-package com.guigroup.app;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+// the relation of level menuitems and the game items can still be improved
 
+package com.guigroup.app;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import javax.swing.*;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.Timer;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
-import javax.swing.Timer;
 
 public class Memory {
     // ================================================ VARIABLE INITIALIZATION ================================================
@@ -46,7 +50,8 @@ public class Memory {
     private JLabel labelTitle, labelTimer;
     private boolean isTimerRunning = false; 
     private Integer timeRemaining;
-    private Timer timerTest; 
+    private Timer timerTest, showCardsTimer; 
+    int showCardsTimeLeft = 4;
 
     private buttonCard previousCard;
 
@@ -54,7 +59,7 @@ public class Memory {
        
     // ================================================ COMPILE RUN THROUGH ================================================
     Memory(){
-        level = 2;
+        level = 1;
         gameDeck = new Deck(level);
         numCorrectPairs = 0;
         setupLevel();
@@ -74,7 +79,6 @@ public class Memory {
         
         frame.pack();
         frame.setVisible(true);
-        System.out.println("Is timer running? " + isTimerRunning);
     }
 
     private void createMenuBar(){
@@ -113,74 +117,31 @@ public class Memory {
 
         newGameItem.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                if(isTimerRunning == true) {
-                    timerTest.stop();
-                    System.out.println("Is timer running when I do timerteststop? " + isTimerRunning);
-                    isTimerRunning = false;
-                }
-                
-                changeGrid(level);
-                startGameItem.setVisible(true);
-                solveGameItem.setVisible(true);
-                System.out.println("New Game!");
-                System.out.println("Is timer running? " + isTimerRunning);
-                
-            }
+            public void actionPerformed(ActionEvent e) {newGameTest();}
         });
 
         solveGameItem.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                if (isTimerRunning == true) {
-                    timerTest.stop();
-                    isTimerRunning = false;
-                    
-                }
-                
-                numCorrectPairs = numCards;
-                previousCard = null;
-
-                for(int i = 0; i < listCards.size(); i++) {
-                    buttonCard cardSolved = listCards.get(i);
-                    cardSolved.setIcon(gameDeck.getCard(listShuffle.get(i), level));
-                }
-
-                solveGameItem.setVisible(false);
-                startGameItem.setVisible(false);
-                frame.validate();
-                frame.repaint();
-            }
+            public void actionPerformed(ActionEvent e) {solveGameTest();}
         });
 
         startGameItem.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                if (isTimerRunning == false) {
-                    // showcard method()
-                    labelTimer.setText("Countdown: " + new TimerListenerTest());
-                    timerTest = new Timer(1000, new TimerListenerTest());
-                    timerTest.start();
-                    
-                    isTimerRunning = true;                    
-                    startGameItem.setVisible(false);
-                } 
-                                
-            }
+            public void actionPerformed(ActionEvent e) {startGameTest();}
         });
 
         easyItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 level = 1;
-                changeGrid(level);
+                newGameTest();
             }
         });
         mediumItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 level = 2;
-                changeGrid(level);
+                newGameTest();
             }
 
         });
@@ -188,7 +149,7 @@ public class Memory {
             @Override
             public void actionPerformed(ActionEvent e) {
                 level = 3;
-                changeGrid(level);
+                newGameTest();
             }
         });
         aboutItem.addActionListener(new ActionListener() {
@@ -200,10 +161,7 @@ public class Memory {
 
         exitItem.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Exit");
-                System.exit(0);
-            }
+            public void actionPerformed(ActionEvent e) {System.exit(0);}
         });
     }
 
@@ -212,8 +170,7 @@ public class Memory {
         labelTitle.setForeground(Color.white);
         enlargeFont(labelTitle, 3);
         
-        // labelTimer = new JLabel("Countdown: " + timeLeft);
-        labelTimer = new JLabel("Countdown: " + timeRemaining);
+        labelTimer = new JLabel("Time Left: " + timeRemaining);
         labelTimer.setForeground(Color.white);
         enlargeFont(labelTimer, 2);
         
@@ -249,11 +206,7 @@ public class Memory {
             public void mouseClicked(MouseEvent e) {}
 
             @Override
-            public void mousePressed(MouseEvent e) {
-                // NewGame();
-                buttonStart.setVisible(true);
-                buttonSolve.setVisible(false);
-            }
+            public void mousePressed(MouseEvent e) {newGameTest();}
 
             @Override
             public void mouseReleased(MouseEvent e) {}
@@ -270,11 +223,7 @@ public class Memory {
             public void mouseClicked(MouseEvent e) {}
 
             @Override
-            public void mousePressed(MouseEvent e) {
-                // Solve(false);
-                buttonStart.setVisible(false);
-            }
-
+            public void mousePressed(MouseEvent e) {solveGameTest();}
             @Override
             public void mouseReleased(MouseEvent e) {}
 
@@ -290,11 +239,7 @@ public class Memory {
             public void mouseClicked(MouseEvent e) {}
 
             @Override
-            public void mousePressed(MouseEvent e) {
-                // Start();
-                buttonStart.setVisible(false);
-                buttonSolve.setVisible(false);
-            }
+            public void mousePressed(MouseEvent e) {startGameTest();}
 
             @Override
             public void mouseReleased(MouseEvent e) {}
@@ -361,7 +306,7 @@ public class Memory {
                                 numCorrectPairs++;
 
                                 if(numCorrectPairs >= numCards){
-                                    // Solve(true);
+                                    solveGameTest();
                                 }	
                             }
                             else {
@@ -434,24 +379,83 @@ public class Memory {
         frame.repaint();
     }
 
-    public void newGameTest(){}
-
-    public void solveGameTest(){}
-
-    public void startGameTest(){}
-    
-    private class TimerListenerTest implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            timeRemaining--;
-            labelTimer.setText("Countdown: " + timeRemaining);
-
-            if(timeRemaining == 0) {
-                
-                timerTest.stop();
-                solveGameTest();
-            }
+    public void newGameTest(){
+        if(isTimerRunning == true) {
+            timerTest.stop();
+            isTimerRunning = false;
         }
+        
+        changeGrid(level);
+        startGameItem.setVisible(true);
+        solveGameItem.setVisible(true);
+        buttonStart.setVisible(true);
+        buttonSolve.setVisible(true);
+    }
+
+    public void solveGameTest(){
+        if (isTimerRunning == true) {
+            timerTest.stop();
+            isTimerRunning = false;
+        }
+        
+        numCorrectPairs = numCards;
+        previousCard = null;
+
+        for(int i = 0; i < listCards.size(); i++) {
+            buttonCard cardSolved = listCards.get(i);
+            cardSolved.setIcon(gameDeck.getCard(listShuffle.get(i), level));
+        }
+
+        solveGameItem.setVisible(false);
+        startGameItem.setVisible(false);
+        buttonSolve.setVisible(false);
+        buttonStart.setVisible(false);
+        frame.validate();
+        frame.repaint();
+    }
+
+    public void startGameTest(){
+        if (isTimerRunning == false) {
+            showCardsTimer = new Timer(1000, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    // Show Cards Timer                 
+                    showCardsTimeLeft--;
+                    labelTimer.setText("Get Ready! " + showCardsTimeLeft);
+                    System.out.println("showCardsTimeLeft: " + showCardsTimeLeft);
+                    
+                    if(showCardsTimeLeft == 0) {
+                        showCardsTimer.stop();
+                        labelTimer.setText("Game!");
+                        // System.out.println("showCardsTimer stopped!");
+
+                        // Real Timer
+                        labelTimer.setText("Time Left: " + timeRemaining);
+                        timerTest = new Timer(1000, new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+                                timeRemaining--;
+                                labelTimer.setText("Time Left: " + timeRemaining);
+                                // System.out.println("timeRemaining: " + timeRemaining);
+
+                                if(timeRemaining == 0) {
+                                    
+                                    timerTest.stop();
+                                    solveGameTest();
+                                }
+                            }
+                        });
+                        timerTest.start();
+                    }
+                }
+            });
+            showCardsTimer.start();
+            
+            
+            isTimerRunning = true;                    
+            startGameItem.setVisible(false);
+            buttonStart.setVisible(false);
+        } 
     }
 
     /**
