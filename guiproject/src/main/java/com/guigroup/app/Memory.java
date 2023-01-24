@@ -64,7 +64,7 @@ public class Memory {
     }
 
     public void createGUI(){
-        frame = new JFrame("Memory");
+        frame = new JFrame("Match Monster");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
         
@@ -334,20 +334,6 @@ public class Memory {
         frame.add(panelGrid,BorderLayout.CENTER);
     }
 
-    private void createShuffledNumbers(){
-        listShuffle = new ArrayList<>();
-        
-        for (int i = 1; i <= numCards; i++) {
-            listShuffle.add(i);
-            listShuffle.add(i);
-        }
-        Collections.shuffle(listShuffle);
-    }
-
-    private void enlargeFont(java.awt.Component c, float factor) {
-        c.setFont(c.getFont().deriveFont(c.getFont().getSize() * factor));
-    }
-    
     private void setupLevel(){
         numCorrectPairs = 0;
 
@@ -376,27 +362,6 @@ public class Memory {
         createShuffledNumbers();
     }
 
-    private class buttonCard extends JButton{
-        Integer cardNo;
-        public buttonCard(Integer cardNo){
-            this.cardNo = cardNo;
-        }
-    }
-
-    private void changeGrid(int level) {
-        gameDeck = new Deck(level);
-        setupLevel();
-        frame.remove(panelGrid);
-        frame.remove(panelTitle);
-        
-        createPanelGrid();
-        createPanelTitle();
-
-        frame.pack();
-        frame.validate();
-        frame.repaint();
-    }
-
     public void newGameTest(){
         if(isTimerRunning == true) {
             showCardsTimer.stop();
@@ -411,8 +376,6 @@ public class Memory {
         
         startGameItem.setVisible(true);
         buttonStart.setVisible(true);
-        // solveGameItem.setVisible(true);
-        // buttonSolve.setVisible(true); 
     }
 
     public void solveGameTest(){
@@ -493,6 +456,38 @@ public class Memory {
         } 
     }
 
+
+    private void createShuffledNumbers(){
+        listShuffle = new ArrayList<>();
+        
+        for (int i = 1; i <= numCards; i++) {
+            listShuffle.add(i);
+            listShuffle.add(i);
+        }
+        Collections.shuffle(listShuffle);
+    }
+
+    private class buttonCard extends JButton {
+        Integer cardNo;
+        public buttonCard(Integer cardNo){
+            this.cardNo = cardNo;
+        }
+    }
+
+    private void changeGrid(int level) {
+        gameDeck = new Deck(level);
+        setupLevel();
+        frame.remove(panelGrid);
+        frame.remove(panelTitle);
+        
+        createPanelGrid();
+        createPanelTitle();
+
+        frame.pack();
+        frame.validate();
+        frame.repaint();
+    }
+
     private void flipCards(String state){
         if(state == "show") {
             for(int i = 0; i < listCards.size(); i++) {
@@ -515,6 +510,9 @@ public class Memory {
         frame.repaint();
     }
 
+    private void enlargeFont(java.awt.Component c, float factor) {
+        c.setFont(c.getFont().deriveFont(c.getFont().getSize() * factor));
+    }
 
     /**
      * @param args the command line arguments
