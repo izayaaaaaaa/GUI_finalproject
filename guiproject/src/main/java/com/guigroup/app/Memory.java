@@ -62,9 +62,7 @@ public class Memory {
     Memory(){
         level = 1;
         gameDeck = new Deck(level);
-        numCorrectPairs = 0;
         setupLevel();
-
     }
 
     public void createGUI(){
@@ -77,7 +75,7 @@ public class Memory {
         createPanelControl();
         createPanelGrid();
         
-        frame.pack();
+        // frame.pack();
         frame.setVisible(true);
         frame.setPreferredSize(new Dimension(650, 700));
         frame.setMinimumSize(frame.getPreferredSize());
@@ -200,7 +198,7 @@ public class Memory {
         buttonSolve.setFont(new Font("Futura", Font.PLAIN, 12));
         enlargeFont(buttonSolve, 2);
         panelControl.add(buttonSolve);
-        buttonSolve.setVisible(false);
+        
 
         buttonStart = new JButton("Start");
         buttonStart.setFont(new Font("Futura", Font.PLAIN, 12));
@@ -261,6 +259,9 @@ public class Memory {
     }
 
     private void createPanelGrid(){
+        solveGameItem.setVisible(false);
+        buttonSolve.setVisible(false);
+
         panelGrid = new JPanel();
         panelGrid.setBackground(Color.decode("#042243"));
         panelGrid.setLayout(new GridLayout(gridRow,gridCol,20,20));
@@ -345,12 +346,15 @@ public class Memory {
     }
     
     private void setupLevel(){
+        numCorrectPairs = 0;
+
         if(level == 2) {
             numCards = 10;
             gridCol = 5;
             gridRow = 4;
             timeRemaining = 15;
             defaultShowCardsTime = 11;
+            
         }
         else if(level == 3) {
             numCards = 12;
@@ -392,15 +396,17 @@ public class Memory {
 
     public void newGameTest(){
         if(isTimerRunning == true) {
+            showCardsTimer.stop();
             timerTest.stop();
             isTimerRunning = false;
         }
-        // numCorrectPairs = 0; DOUBLE CHECK!!!
+ 
         changeGrid(level);
+        
         startGameItem.setVisible(true);
-        solveGameItem.setVisible(true);
         buttonStart.setVisible(true);
-        buttonSolve.setVisible(false); // double check the effect!!!
+        // solveGameItem.setVisible(true);
+        // buttonSolve.setVisible(true); 
     }
 
     public void solveGameTest(){
@@ -418,8 +424,8 @@ public class Memory {
         }
 
         solveGameItem.setVisible(false);
-        startGameItem.setVisible(false);
         buttonSolve.setVisible(false);
+        startGameItem.setVisible(false);
         buttonStart.setVisible(false);
         frame.validate();
         frame.repaint();
@@ -427,40 +433,29 @@ public class Memory {
 
     public void startGameTest(){
         if (isTimerRunning == false) {
+            // show cards
             showCardsRemaining = defaultShowCardsTime;
-            System.out.println("showCardsRemaining acquired: " + showCardsRemaining);
-
-            for(int i = 0; i < listCards.size(); i++) {
-                buttonCard cardSolved = listCards.get(i);
-                cardSolved.setIcon(gameDeck.getCard(listShuffle.get(i), level));
-            }
-
-            frame.validate();
-            frame.repaint();
+            levelsMenu.setVisible(false); // avoid showtimer bug with level options
+            flipCards("show");
 
             showCardsTimer = new Timer(1000, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {        
-
+                    
                     // Show Cards Timer
                     showCardsRemaining--;
                     labelTimer.setText("Get Ready! " + showCardsRemaining);
-                    System.out.println("showCardsRemaining: " + showCardsRemaining);
 
                     if(showCardsRemaining == 0) {
                         showCardsTimer.stop();
-                        buttonSolve.setVisible(true); // why? double check
+                        
+                        buttonSolve.setVisible(true); 
+                        levelsMenu.setVisible(true); 
+
                         labelTimer.setText("Game!");
                         showCardsRemaining = defaultShowCardsTime;
 
-                        // Flip the cards back!
-                        for(int i = 0; i < listCards.size(); i++) {
-                            buttonCard cardSolved = listCards.get(i);
-                            cardSolved.setIcon(gameDeck.getCard(-1, level));
-                        }
-
-                        frame.validate();
-                        frame.repaint();
+                        flipCards("hide");
 
                         // Real Timer
                         labelTimer.setText("Time Left: " + timeRemaining);
@@ -487,6 +482,29 @@ public class Memory {
             buttonStart.setVisible(false);
         } 
     }
+
+    private void flipCards(String state){
+        if(state == "show") {
+            for(int i = 0; i < listCards.size(); i++) {
+                buttonCard cardSolved = listCards.get(i);
+                cardSolved.setIcon(gameDeck.getCard(listShuffle.get(i), level));
+            }
+        }
+        else if(state == "hide") {
+            for(int i = 0; i < listCards.size(); i++) {
+                buttonCard cardSolved = listCards.get(i);
+                cardSolved.setIcon(gameDeck.getCard(-1, level));
+            }
+        }
+        else {
+            System.out.println("undefined state!");
+            return;
+        }
+
+        frame.validate();
+        frame.repaint();
+    }
+
 
     /**
      * @param args the command line arguments
